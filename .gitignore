@@ -1,0 +1,93 @@
+# Visual Studio ile ilgili dosyalar
+.vscode/
+.vs/
+*.code-workspace
+
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# build çıktıları
+bin/
+obj/
+[Bb]uild[Ll]og.*
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Windows image file caches
+*.cache
+*.pdb
+*.mdb
+*.ilk
+*.idb
+
+# Installer output
+*.exe
+*.dll
+
+# Test Results
+TestResults/
+.trx
+*.vsmdi
+*.appx
+*.appxbundle
+*.appxupload
+*.appxsym
+*.cer
+.packages
+*.ap_
+
+# Log ve analiz dosyaları
+*.log
+*.tlog
+*.log.xml
+
+# Database
+*.mdf
+*.ldf
+
+# StyleCop ve ReSharper gibi araçlardan gelen dosyalar
+_StyleCopReport.xml
+.ReSharper
+
+# Rider projeleri için
+.idea/
+
+# Coverage Tool Output
+*.coverage
+*.coveragexml
+
+# Resharper  settings
+*.DotSettings.user
+resharper
+
+# Windows Anaconda
+.conda/
+
+# CMake generated files
+CMakeLists.txt.user
+CMakeCache.txt
+
+# JetBrains Rider
+.idea/
+*.iws
+
+# macOS
+.DS_Store
