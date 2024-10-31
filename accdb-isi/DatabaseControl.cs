@@ -211,12 +211,11 @@ namespace DatabaseController
                     command.ExecuteNonQuery();
                 }
 
-                return "tblprestoserver";
+                return null;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Veritabanına veri kaydetme hatası: " + ex.Message);
-                return null;
+                return ex.Message;
             }
         }
 

@@ -212,7 +212,7 @@ namespace accdb_isi
         // bu ikisini de kontrol edicek, ikisi de bağlı ise olucak
         private void ConnectionController()
         {
-            if (dbConnected && timeConnected && tempretureConnected)
+            if (dbConnected)
             {
                 string timerData = string.Empty;
                 int timerInterval = 100;
@@ -278,11 +278,19 @@ namespace accdb_isi
                     string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
                     string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
 
-                    databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
+                    string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
+                    if (!string.IsNullOrEmpty(errMessage))
+                    {
+                        ProcessController(false);
+                        MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + errMessage);
+                        return;
+                    }
                 }
                 catch (Exception ex)
                 {
+                    ProcessController(false);
                     MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + ex.Message);
+                    return;
                 }
                 
             }

@@ -48,11 +48,11 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabIslemler = new System.Windows.Forms.TabPage();
             this.tabAyarlar = new System.Windows.Forms.TabPage();
-            this.labelDatabase = new System.Windows.Forms.Label();
-            this.btnDBSelect = new System.Windows.Forms.Button();
-            this.textBoxDBPath = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.comboBoxModbusConn = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxDBPath = new System.Windows.Forms.TextBox();
+            this.btnDBSelect = new System.Windows.Forms.Button();
+            this.labelDatabase = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -200,7 +200,7 @@
             // generalTimer
             // 
             this.generalTimer.Enabled = true;
-            this.generalTimer.Interval = 800;
+            this.generalTimer.Interval = 8000;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
             // btnStart
@@ -265,14 +265,30 @@
             this.tabAyarlar.Text = "Ayarlar";
             this.tabAyarlar.UseVisualStyleBackColor = true;
             // 
-            // labelDatabase
+            // comboBoxModbusConn
             // 
-            this.labelDatabase.AutoSize = true;
-            this.labelDatabase.Location = new System.Drawing.Point(35, 136);
-            this.labelDatabase.Name = "labelDatabase";
-            this.labelDatabase.Size = new System.Drawing.Size(81, 13);
-            this.labelDatabase.TabIndex = 0;
-            this.labelDatabase.Text = "Veritabanı Yolu:";
+            this.comboBoxModbusConn.FormattingEnabled = true;
+            this.comboBoxModbusConn.Location = new System.Drawing.Point(137, 229);
+            this.comboBoxModbusConn.Name = "comboBoxModbusConn";
+            this.comboBoxModbusConn.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxModbusConn.TabIndex = 4;
+            this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(35, 232);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(96, 13);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "Modbus Bağlantısı:";
+            // 
+            // textBoxDBPath
+            // 
+            this.textBoxDBPath.Location = new System.Drawing.Point(122, 133);
+            this.textBoxDBPath.Name = "textBoxDBPath";
+            this.textBoxDBPath.Size = new System.Drawing.Size(422, 20);
+            this.textBoxDBPath.TabIndex = 2;
             // 
             // btnDBSelect
             // 
@@ -284,30 +300,14 @@
             this.btnDBSelect.UseVisualStyleBackColor = true;
             this.btnDBSelect.Click += new System.EventHandler(this.btnDBSelect_Click);
             // 
-            // textBoxDBPath
+            // labelDatabase
             // 
-            this.textBoxDBPath.Location = new System.Drawing.Point(122, 133);
-            this.textBoxDBPath.Name = "textBoxDBPath";
-            this.textBoxDBPath.Size = new System.Drawing.Size(422, 20);
-            this.textBoxDBPath.TabIndex = 2;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(35, 232);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(96, 13);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "Modbus Bağlantısı:";
-            // 
-            // comboBoxModbusConn
-            // 
-            this.comboBoxModbusConn.FormattingEnabled = true;
-            this.comboBoxModbusConn.Location = new System.Drawing.Point(137, 229);
-            this.comboBoxModbusConn.Name = "comboBoxModbusConn";
-            this.comboBoxModbusConn.Size = new System.Drawing.Size(121, 21);
-            this.comboBoxModbusConn.TabIndex = 4;
-            this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
+            this.labelDatabase.AutoSize = true;
+            this.labelDatabase.Location = new System.Drawing.Point(35, 136);
+            this.labelDatabase.Name = "labelDatabase";
+            this.labelDatabase.Size = new System.Drawing.Size(81, 13);
+            this.labelDatabase.TabIndex = 0;
+            this.labelDatabase.Text = "Veritabanı Yolu:";
             // 
             // Form1
             // 
