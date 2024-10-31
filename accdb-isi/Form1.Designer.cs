@@ -55,7 +55,6 @@
             this.labelDatabase = new System.Windows.Forms.Label();
             this.labelTimerID = new System.Windows.Forms.Label();
             this.labelTempertureID = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
             this.textBoxTimerID = new System.Windows.Forms.TextBox();
             this.textBoxTempID = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
@@ -233,7 +232,6 @@
             // 
             // tabIslemler
             // 
-            this.tabIslemler.Controls.Add(this.button1);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
             this.tabIslemler.Controls.Add(this.makineLabel);
             this.tabIslemler.Controls.Add(this.btnStart);
@@ -337,16 +335,6 @@
             this.labelTempertureID.TabIndex = 6;
             this.labelTempertureID.Text = "Sıcaklık cihazı ID:";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(343, 379);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // textBoxTimerID
             // 
             this.textBoxTimerID.Location = new System.Drawing.Point(137, 270);
@@ -406,7 +394,6 @@
         private System.Windows.Forms.TextBox textBoxDBPath;
         private System.Windows.Forms.Label labelTempertureID;
         private System.Windows.Forms.Label labelTimerID;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textBoxTempID;
         private System.Windows.Forms.TextBox textBoxTimerID;
     }
