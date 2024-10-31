@@ -157,7 +157,7 @@ namespace DatabaseController
 
         }
 
-        public string DeleteData(string tableName, int startRowID = 1, int endRowID = -1)
+        public string DeleteData(string tableName, int startRowID = 0, int endRowID = -1)
         {
             try
             {
