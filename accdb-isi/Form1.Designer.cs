@@ -48,15 +48,17 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabIslemler = new System.Windows.Forms.TabPage();
             this.tabAyarlar = new System.Windows.Forms.TabPage();
+            this.textBoxTemp2ID = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBoxTemp1ID = new System.Windows.Forms.TextBox();
+            this.textBoxTimerID = new System.Windows.Forms.TextBox();
+            this.labelTempertureID = new System.Windows.Forms.Label();
+            this.labelTimerID = new System.Windows.Forms.Label();
             this.comboBoxModbusConn = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxDBPath = new System.Windows.Forms.TextBox();
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
-            this.labelTimerID = new System.Windows.Forms.Label();
-            this.labelTempertureID = new System.Windows.Forms.Label();
-            this.textBoxTimerID = new System.Windows.Forms.TextBox();
-            this.textBoxTempID = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -256,7 +258,9 @@
             // 
             // tabAyarlar
             // 
-            this.tabAyarlar.Controls.Add(this.textBoxTempID);
+            this.tabAyarlar.Controls.Add(this.textBoxTemp2ID);
+            this.tabAyarlar.Controls.Add(this.label4);
+            this.tabAyarlar.Controls.Add(this.textBoxTemp1ID);
             this.tabAyarlar.Controls.Add(this.textBoxTimerID);
             this.tabAyarlar.Controls.Add(this.labelTempertureID);
             this.tabAyarlar.Controls.Add(this.labelTimerID);
@@ -273,12 +277,60 @@
             this.tabAyarlar.Text = "Ayarlar";
             this.tabAyarlar.UseVisualStyleBackColor = true;
             // 
+            // textBoxTemp2ID
+            // 
+            this.textBoxTemp2ID.Location = new System.Drawing.Point(137, 339);
+            this.textBoxTemp2ID.Name = "textBoxTemp2ID";
+            this.textBoxTemp2ID.Size = new System.Drawing.Size(100, 20);
+            this.textBoxTemp2ID.TabIndex = 10;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(35, 342);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(100, 13);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Sıcaklık cihazı 2 ID:";
+            // 
+            // textBoxTemp1ID
+            // 
+            this.textBoxTemp1ID.Location = new System.Drawing.Point(137, 305);
+            this.textBoxTemp1ID.Name = "textBoxTemp1ID";
+            this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
+            this.textBoxTemp1ID.TabIndex = 8;
+            // 
+            // textBoxTimerID
+            // 
+            this.textBoxTimerID.Location = new System.Drawing.Point(137, 270);
+            this.textBoxTimerID.Name = "textBoxTimerID";
+            this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
+            this.textBoxTimerID.TabIndex = 7;
+            // 
+            // labelTempertureID
+            // 
+            this.labelTempertureID.AutoSize = true;
+            this.labelTempertureID.Location = new System.Drawing.Point(35, 308);
+            this.labelTempertureID.Name = "labelTempertureID";
+            this.labelTempertureID.Size = new System.Drawing.Size(100, 13);
+            this.labelTempertureID.TabIndex = 6;
+            this.labelTempertureID.Text = "Sıcaklık cihazı 1 ID:";
+            // 
+            // labelTimerID
+            // 
+            this.labelTimerID.AutoSize = true;
+            this.labelTimerID.Location = new System.Drawing.Point(35, 273);
+            this.labelTimerID.Name = "labelTimerID";
+            this.labelTimerID.Size = new System.Drawing.Size(87, 13);
+            this.labelTimerID.TabIndex = 5;
+            this.labelTimerID.Text = "Zaman cihazı ID:";
+            // 
             // comboBoxModbusConn
             // 
             this.comboBoxModbusConn.FormattingEnabled = true;
             this.comboBoxModbusConn.Location = new System.Drawing.Point(137, 229);
             this.comboBoxModbusConn.Name = "comboBoxModbusConn";
-            this.comboBoxModbusConn.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxModbusConn.Size = new System.Drawing.Size(100, 21);
             this.comboBoxModbusConn.TabIndex = 4;
             this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
             // 
@@ -316,38 +368,6 @@
             this.labelDatabase.Size = new System.Drawing.Size(81, 13);
             this.labelDatabase.TabIndex = 0;
             this.labelDatabase.Text = "Veritabanı Yolu:";
-            // 
-            // labelTimerID
-            // 
-            this.labelTimerID.AutoSize = true;
-            this.labelTimerID.Location = new System.Drawing.Point(35, 273);
-            this.labelTimerID.Name = "labelTimerID";
-            this.labelTimerID.Size = new System.Drawing.Size(87, 13);
-            this.labelTimerID.TabIndex = 5;
-            this.labelTimerID.Text = "Zaman cihazı ID:";
-            // 
-            // labelTempertureID
-            // 
-            this.labelTempertureID.AutoSize = true;
-            this.labelTempertureID.Location = new System.Drawing.Point(35, 308);
-            this.labelTempertureID.Name = "labelTempertureID";
-            this.labelTempertureID.Size = new System.Drawing.Size(91, 13);
-            this.labelTempertureID.TabIndex = 6;
-            this.labelTempertureID.Text = "Sıcaklık cihazı ID:";
-            // 
-            // textBoxTimerID
-            // 
-            this.textBoxTimerID.Location = new System.Drawing.Point(137, 270);
-            this.textBoxTimerID.Name = "textBoxTimerID";
-            this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
-            this.textBoxTimerID.TabIndex = 7;
-            // 
-            // textBoxTempID
-            // 
-            this.textBoxTempID.Location = new System.Drawing.Point(137, 305);
-            this.textBoxTempID.Name = "textBoxTempID";
-            this.textBoxTempID.Size = new System.Drawing.Size(100, 20);
-            this.textBoxTempID.TabIndex = 8;
             // 
             // Form1
             // 
@@ -394,8 +414,10 @@
         private System.Windows.Forms.TextBox textBoxDBPath;
         private System.Windows.Forms.Label labelTempertureID;
         private System.Windows.Forms.Label labelTimerID;
-        private System.Windows.Forms.TextBox textBoxTempID;
+        private System.Windows.Forms.TextBox textBoxTemp1ID;
         private System.Windows.Forms.TextBox textBoxTimerID;
+        private System.Windows.Forms.TextBox textBoxTemp2ID;
+        private System.Windows.Forms.Label label4;
     }
 }
 

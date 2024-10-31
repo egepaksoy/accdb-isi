@@ -101,22 +101,22 @@ namespace accdb_isi
                     return;
                 }
 
-                //if (!timeConnected)
-                //    if (timeDevice.ConnectPlc() == null)
-                //        timeConnected = true;
+                if (!timeConnected)
+                    if (timeDevice.ConnectPlc() == null)
+                        timeConnected = true;
 
-                //if (!tempretureConnected)
-                //    if (tempretureDevice.ConnectPlc() == null)
-                //        tempretureConnected = true;
+                if (!tempretureConnected)
+                    if (tempretureDevice.ConnectPlc() == null)
+                        tempretureConnected = true;
 
-                //if (tempretureConnected != timeConnected)
-                //{
-                //    tempretureConnected = !tempretureDevice.DisconnectPlc();
-                //    timeConnected = !timeDevice.DisconnectPlc();
-                //}
+                if (tempretureConnected != timeConnected)
+                {
+                    tempretureConnected = !tempretureDevice.DisconnectPlc();
+                    timeConnected = !timeDevice.DisconnectPlc();
+                }
 
-                timeConnected = true;
-                tempretureConnected = true;
+                //timeConnected = true;
+                //tempretureConnected = true;
 
                 if (tempretureConnected == timeConnected)
                     ConnectionController();
@@ -131,20 +131,20 @@ namespace accdb_isi
                 tempretureDevice = null;
                 timeDevice = null;
 
-                //if (timeConnected)
-                //    timeConnected = !timeDevice.DisconnectPlc();
+                if (timeConnected)
+                    timeConnected = !timeDevice.DisconnectPlc();
 
-                //if (tempretureConnected)
-                //    tempretureConnected = !tempretureDevice.DisconnectPlc();
+                if (tempretureConnected)
+                    tempretureConnected = !tempretureDevice.DisconnectPlc();
 
-                //if (tempretureConnected != timeConnected)
-                //{
-                //    tempretureConnected = !tempretureDevice.DisconnectPlc();
-                //    timeConnected = !timeDevice.DisconnectPlc();
-                //}
+                if (tempretureConnected != timeConnected)
+                {
+                    tempretureConnected = !tempretureDevice.DisconnectPlc();
+                    timeConnected = !timeDevice.DisconnectPlc();
+                }
 
-                tempretureConnected = false;
-                timeConnected = false;
+                //tempretureConnected = false;
+                //timeConnected = false;
 
                 if (tempretureConnected == timeConnected)
                     ConnectionController();
@@ -302,7 +302,7 @@ namespace accdb_isi
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
                     int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
-                    string GetSure = DateTime.UtcNow.ToString();// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
+                    string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
                     string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
                     string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
 
@@ -367,10 +367,10 @@ namespace accdb_isi
                 if (textBoxDBPath.Text != databasePath)
                     textBoxDBPath.Text = databasePath;
 
-                if (!string.IsNullOrEmpty(textBoxTempID.Text))
+                if (!string.IsNullOrEmpty(textBoxTemp1ID.Text))
                 {
-                    if (Convert.ToInt32(textBoxTempID.Text) != tempretureID)
-                        tempretureID = Convert.ToInt32(textBoxTempID.Text);
+                    if (Convert.ToInt32(textBoxTemp1ID.Text) != tempretureID)
+                        tempretureID = Convert.ToInt32(textBoxTemp1ID.Text);
                 }
 
                 if (!string.IsNullOrEmpty(textBoxTimerID.Text))
@@ -450,7 +450,7 @@ namespace accdb_isi
                     //! modbus cihazı olmadığında burası veri yazmada sıkıntı cıkarıyor
                     string temp1Err = tempretureDevice.WriteHoldRegData((int)HoldRegAddresses.Sicaklik1, SetSicaklik1);
                     string temp2Err = tempretureDevice.WriteHoldRegData((int)HoldRegAddresses.Sicaklik2, SetSicaklik2);
-                    string timerErr = timeDevice.WriteHoldRegData((int)HoldRegAddresses.Sure, SetSure);
+                    string timerErr = timeDevice.WriteHoldRegData((int)HoldRegAddresses.Timer, SetSure);
 
                     if (timerErr != null || temp1Err != null || temp2Err != null)
                     {

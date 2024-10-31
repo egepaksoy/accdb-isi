@@ -10,6 +10,14 @@ namespace Addresses
     {
         Sicaklik1 = 0,
         Sicaklik2 = 1,
-        Sure = 12,
+        Timer = 0,
+    }
+    internal enum InputRegAddresses
+    {
+        timer1 = 0,
+        timer2 = 1,
+
+        olculenSicaklik = 0,
+        setSicaklik = 4,
     }
 }

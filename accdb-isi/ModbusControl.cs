@@ -103,7 +103,7 @@ namespace ModbusController
                 serialPort.ReadTimeout = readTimeout;
                 serialPort.WriteTimeout = writeTimeout;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -133,17 +133,49 @@ namespace ModbusController
 
                 veriCekildi = true;
             }
-            catch (TimeoutException ex)
-            {
-                return null;
-            }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
             if (veriCekildi)
                 return string.Join(":", gelenVeri);
             return null;
+        }
+
+        public string ReadInputRegsData(int InputAddress, ushort numRegisters = 1)
+        {
+            ushort inputAddress = Convert.ToUInt16(InputAddress);
+            bool veriCekildi = false;
+            List<string> gelenVeri = new List<string>();
+            ushort[] inputRegisters;
+            string connectionError = TryConnect();
+            string returnData = null;
+
+            if (!string.IsNullOrEmpty(connectionError))
+            {
+                return returnData;
+            }
+
+            try
+            {
+                gelenVeri.Clear();
+
+                inputRegisters = modbusMaster.ReadHoldingRegisters(slaveId, inputAddress, numRegisters);
+                foreach (ushort inputRegister in inputRegisters)
+                    gelenVeri.Add(inputRegister.ToString());
+
+                veriCekildi = true;
+            }
+            catch
+            {
+                return returnData;
+            }
+            finally
+            {
+                if (veriCekildi)
+                    returnData = string.Join(":", gelenVeri);
+            }
+            return returnData;
         }
 
         public string ReadHoldRegsData(int RegAddress, ushort numRegisters = 1)
@@ -170,11 +202,7 @@ namespace ModbusController
 
                 veriCekildi = true;
             }
-            catch (TimeoutException ex)
-            {
-                return returnData;
-            }
-            catch (Exception ex)
+            catch
             {
                 return returnData;
             }
