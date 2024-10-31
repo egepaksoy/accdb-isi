@@ -53,6 +53,9 @@
             this.textBoxDBPath = new System.Windows.Forms.TextBox();
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -228,6 +231,7 @@
             // 
             // tabIslemler
             // 
+            this.tabIslemler.Controls.Add(this.button1);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
             this.tabIslemler.Controls.Add(this.makineLabel);
             this.tabIslemler.Controls.Add(this.btnStart);
@@ -252,6 +256,8 @@
             // 
             // tabAyarlar
             // 
+            this.tabAyarlar.Controls.Add(this.label5);
+            this.tabAyarlar.Controls.Add(this.label4);
             this.tabAyarlar.Controls.Add(this.comboBoxModbusConn);
             this.tabAyarlar.Controls.Add(this.label3);
             this.tabAyarlar.Controls.Add(this.textBoxDBPath);
@@ -309,6 +315,34 @@
             this.labelDatabase.TabIndex = 0;
             this.labelDatabase.Text = "Veritabanı Yolu:";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(35, 273);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "label4";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(35, 308);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(35, 13);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "label5";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(343, 379);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -352,6 +386,9 @@
         private System.Windows.Forms.ComboBox comboBoxModbusConn;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxDBPath;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button button1;
     }
 }
 

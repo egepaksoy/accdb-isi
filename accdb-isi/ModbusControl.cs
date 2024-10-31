@@ -44,7 +44,6 @@ namespace ModbusController
             }
             catch (Exception e)
             {
-                MessageBox.Show("Modbus RTU Bağlantı hatası: " + e.Message);
                 return e.Message;
             }
         }
@@ -65,7 +64,6 @@ namespace ModbusController
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Bağlantı hatası {e.Message}");
                 return e.Message;
             }
             return null;
@@ -107,7 +105,6 @@ namespace ModbusController
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Timeout ayarlama hatası: {e.Message}");
                 return false;
             }
             return true;
@@ -123,7 +120,6 @@ namespace ModbusController
 
             if (!string.IsNullOrEmpty(connectionError))
             {
-                MessageBox.Show("PLC'ye bağlanılamadı: " + connectionError);
                 return null;
             }
 
@@ -139,12 +135,10 @@ namespace ModbusController
             }
             catch (TimeoutException ex)
             {
-                MessageBox.Show(ex.Message);
                 return null;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
                 return null;
             }
             if (veriCekildi)
@@ -163,7 +157,6 @@ namespace ModbusController
 
             if (!string.IsNullOrEmpty(connectionError))
             {
-                MessageBox.Show("PLC'ye bağlanılamadı: " + connectionError);
                 return returnData;
             }
 
@@ -179,12 +172,10 @@ namespace ModbusController
             }
             catch (TimeoutException ex)
             {
-                //MessageBox.Show(ex.Message);
                 return returnData;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message);
                 return returnData;
             }
             finally

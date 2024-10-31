@@ -116,6 +116,14 @@ namespace accdb_isi
             }
             else
             {
+                if (tempretureConnected)
+                    tempretureDevice.DisconnectPlc();
+                if (timeConnected)
+                    timeDevice.DisconnectPlc();
+
+                tempretureDevice = null;
+                timeDevice = null;
+
                 //if (timeConnected)
                 //    timeConnected = !timeDevice.DisconnectPlc();
 
@@ -271,10 +279,23 @@ namespace accdb_isi
                 try
                 {
                     // PLC'den veri al
+                    string getSicaklik1 = tempretureDevice.ReadHoldRegsData((int)HoldRegAddresses.Sicaklik1);
+                    string getSicaklik2 = tempretureDevice.ReadHoldRegsData((int)HoldRegAddresses.Sicaklik2);
+
+                    if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
+                    {
+                        ProcessController(false);
+                        MessageBox.Show("Modbus cihazlarından veri alma sorunu");
+                        return;
+                    }
+
+                    GetSicaklik1 = Convert.ToInt32(getSicaklik1);
+                    GetSicaklik2 = Convert.ToInt32(getSicaklik2);
+
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
                     int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
-                    string GetSure = "13";// pressten okunan zaman (bunu kendim görmeliyim)
+                    string GetSure = DateTime.UtcNow.ToString();// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
                     string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
                     string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
 
@@ -358,6 +379,7 @@ namespace accdb_isi
                 }
                 catch (Exception ex)
                 {
+                    ProcessController(false);
                     MessageBox.Show("Modbus cihazlarından veri alma sorunu: " + ex.Message);
                 }
 
@@ -512,6 +534,47 @@ namespace accdb_isi
         private void comboBoxModbusConn_SelectionChangeCommited(object sender, EventArgs e)
         {
             modbusPort = comboBoxModbusConn.SelectedItem.ToString();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+                try
+                {
+                // PLC'den veri al
+                string getSicaklik1 = "1";
+                string getSicaklik2 = "2";
+
+                if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
+                {
+                    ProcessController(false);
+                    MessageBox.Show("Modbus cihazlarından veri alma sorunu");
+                    return;
+                }
+
+                GetSicaklik1 = Convert.ToInt32(getSicaklik1);
+                GetSicaklik2 = Convert.ToInt32(getSicaklik2);
+
+                string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
+                int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
+                int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
+                string GetSure = DateTime.Now.Hour.ToString();// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
+                string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
+                string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
+
+                string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
+                if (!string.IsNullOrEmpty(errMessage))
+                {
+                    ProcessController(false);
+                    MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + errMessage);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ProcessController(false);
+                MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + ex.Message);
+                return;
+            }
         }
     }
 }
