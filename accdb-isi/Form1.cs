@@ -12,6 +12,7 @@ using DatabaseController;
 using ModbusController;
 using Addresses;
 using System.IO.Ports;
+using System.Diagnostics.Eventing.Reader;
 
 
 namespace accdb_isi
@@ -107,8 +108,8 @@ namespace accdb_isi
                 //    timeConnected = !timeDevice.DisconnectPlc();
                 //}
 
-                tempretureConnected = true;
                 timeConnected = true;
+                tempretureConnected = true;
 
                 if (tempretureConnected == timeConnected)
                     ConnectionController();
@@ -133,7 +134,6 @@ namespace accdb_isi
                 if (tempretureConnected == timeConnected)
                     ConnectionController();
             }
-
         }
 
         private void ConnectDB(bool connect)
@@ -332,7 +332,7 @@ namespace accdb_isi
                     textBoxDBPath.Text = databasePath;
             }
 
-            if (timeConnected && tempretureConnected)
+            else if (timeConnected && tempretureConnected)
             {
                 try
                 {
@@ -341,7 +341,7 @@ namespace accdb_isi
 
                     if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
                     {
-                        EndProcess();
+                        ProcessController(false);
                         return;
                     }
 
@@ -404,7 +404,10 @@ namespace accdb_isi
                     string timerErr = timeDevice.WriteHoldRegData((int)HoldRegAddresses.Sure, SetSure);
 
                     if (timerErr != null || temp1Err != null || temp2Err != null)
-                        MessageBox.Show(timerErr + temp1Err + temp2Err);
+                    {
+                        MessageBox.Show("Modbus cihazlarına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
+                        return;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -460,7 +463,12 @@ namespace accdb_isi
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            if (btnStart.Text == "Başlat")
+            ProcessController(btnStart.Text == "Başlat");
+        }
+
+        private void ProcessController(bool connect)
+        {
+            if (connect)
             {
                 ConnectDB(true);
                 ConnectModbus(true);

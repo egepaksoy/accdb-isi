@@ -21,7 +21,7 @@ namespace ModbusController
         private int readTimeout;
         private int writeTimeout;
 
-        public ModbusControl(string address, byte SlaveId, int ReadTimeout = 500, int WriteTimeout = 500)
+        public ModbusControl(string address, byte SlaveId, int ReadTimeout = 300, int WriteTimeout = 300)
         {
             RTUConnect(address);
 
@@ -44,7 +44,7 @@ namespace ModbusController
             }
             catch (Exception e)
             {
-                //MessageBox.Show("Modbus RTU Bağlantı hatası: " + e.Message);
+                MessageBox.Show("Modbus RTU Bağlantı hatası: " + e.Message);
                 return e.Message;
             }
         }
@@ -52,8 +52,6 @@ namespace ModbusController
         public string ConnectPlc()
         {
             SetTimeout(writeTimeout, readTimeout);
-            //if (!SetTimeout(writeTimeout, readTimeout))
-            //    MessageBox.Show("Timeout Ayarlanamadı");
 
             try
             {
@@ -67,7 +65,7 @@ namespace ModbusController
             }
             catch (Exception e)
             {
-                //MessageBox.Show($"Bağlantı hatası {e.Message}");
+                MessageBox.Show($"Bağlantı hatası {e.Message}");
                 return e.Message;
             }
             return null;
@@ -109,7 +107,7 @@ namespace ModbusController
             }
             catch (Exception e)
             {
-                //MessageBox.Show($"Timeout ayarlama hatası: {e.Message}");
+                MessageBox.Show($"Timeout ayarlama hatası: {e.Message}");
                 return false;
             }
             return true;
@@ -161,11 +159,12 @@ namespace ModbusController
             List<string> gelenVeri = new List<string>();
             ushort[] holdingRegisters;
             string connectionError = TryConnect();
+            string returnData = null;
 
             if (!string.IsNullOrEmpty(connectionError))
             {
                 MessageBox.Show("PLC'ye bağlanılamadı: " + connectionError);
-                return null;
+                return returnData;
             }
 
             try
@@ -180,17 +179,20 @@ namespace ModbusController
             }
             catch (TimeoutException ex)
             {
-                MessageBox.Show(ex.Message);
-                return null;
+                //MessageBox.Show(ex.Message);
+                return returnData;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
-                return null;
+                //MessageBox.Show(ex.Message);
+                return returnData;
             }
-            if (veriCekildi)
-                return string.Join(":", gelenVeri);
-            return null;
+            finally
+            {
+                if (veriCekildi)
+                    returnData = string.Join(":", gelenVeri);
+            }
+            return returnData;
         }
 
         public string WriteHoldRegData(int RegAddress, int WriteValue)
