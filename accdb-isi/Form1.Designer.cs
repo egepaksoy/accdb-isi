@@ -53,9 +53,11 @@
             this.textBoxDBPath = new System.Windows.Forms.TextBox();
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
+            this.labelTimerID = new System.Windows.Forms.Label();
+            this.labelTempertureID = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.textBoxTimerID = new System.Windows.Forms.TextBox();
+            this.textBoxTempID = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -203,7 +205,7 @@
             // generalTimer
             // 
             this.generalTimer.Enabled = true;
-            this.generalTimer.Interval = 8000;
+            this.generalTimer.Interval = 800;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
             // btnStart
@@ -256,8 +258,10 @@
             // 
             // tabAyarlar
             // 
-            this.tabAyarlar.Controls.Add(this.label5);
-            this.tabAyarlar.Controls.Add(this.label4);
+            this.tabAyarlar.Controls.Add(this.textBoxTempID);
+            this.tabAyarlar.Controls.Add(this.textBoxTimerID);
+            this.tabAyarlar.Controls.Add(this.labelTempertureID);
+            this.tabAyarlar.Controls.Add(this.labelTimerID);
             this.tabAyarlar.Controls.Add(this.comboBoxModbusConn);
             this.tabAyarlar.Controls.Add(this.label3);
             this.tabAyarlar.Controls.Add(this.textBoxDBPath);
@@ -315,23 +319,23 @@
             this.labelDatabase.TabIndex = 0;
             this.labelDatabase.Text = "Veritabanı Yolu:";
             // 
-            // label4
+            // labelTimerID
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(35, 273);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "label4";
+            this.labelTimerID.AutoSize = true;
+            this.labelTimerID.Location = new System.Drawing.Point(35, 273);
+            this.labelTimerID.Name = "labelTimerID";
+            this.labelTimerID.Size = new System.Drawing.Size(87, 13);
+            this.labelTimerID.TabIndex = 5;
+            this.labelTimerID.Text = "Zaman cihazı ID:";
             // 
-            // label5
+            // labelTempertureID
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(35, 308);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(35, 13);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "label5";
+            this.labelTempertureID.AutoSize = true;
+            this.labelTempertureID.Location = new System.Drawing.Point(35, 308);
+            this.labelTempertureID.Name = "labelTempertureID";
+            this.labelTempertureID.Size = new System.Drawing.Size(91, 13);
+            this.labelTempertureID.TabIndex = 6;
+            this.labelTempertureID.Text = "Sıcaklık cihazı ID:";
             // 
             // button1
             // 
@@ -342,6 +346,20 @@
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // textBoxTimerID
+            // 
+            this.textBoxTimerID.Location = new System.Drawing.Point(137, 270);
+            this.textBoxTimerID.Name = "textBoxTimerID";
+            this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
+            this.textBoxTimerID.TabIndex = 7;
+            // 
+            // textBoxTempID
+            // 
+            this.textBoxTempID.Location = new System.Drawing.Point(137, 305);
+            this.textBoxTempID.Name = "textBoxTempID";
+            this.textBoxTempID.Size = new System.Drawing.Size(100, 20);
+            this.textBoxTempID.TabIndex = 8;
             // 
             // Form1
             // 
@@ -386,9 +404,11 @@
         private System.Windows.Forms.ComboBox comboBoxModbusConn;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxDBPath;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label labelTempertureID;
+        private System.Windows.Forms.Label labelTimerID;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox textBoxTempID;
+        private System.Windows.Forms.TextBox textBoxTimerID;
     }
 }
 

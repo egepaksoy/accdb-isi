@@ -25,6 +25,8 @@ namespace accdb_isi
 
         string databasePath = string.Empty;
         string modbusPort = string.Empty;
+        int tempretureID = -1;
+        int timerID = -1;
         string[] portNames = SerialPort.GetPortNames();
         string[] oldPortNames;
 
@@ -82,11 +84,16 @@ namespace accdb_isi
                     MessageBox.Show("Ayarlardan modbus cihazı yolunu seçin");
                     return;
                 }
+                if (tempretureID < 0 && timerID < 0)
+                {
+                    MessageBox.Show("Ayarlardan modbus cihazlarının slave idlerini girin");
+                    return;
+                }
 
                 try
                 {
-                    tempretureDevice = new ModbusControl(modbusPort, 1);
-                    timeDevice = new ModbusControl(modbusPort, 3);
+                    tempretureDevice = new ModbusControl(modbusPort, tempretureID);
+                    timeDevice = new ModbusControl(modbusPort, timerID);
                 }
                 catch (Exception ex)
                 {
@@ -359,6 +366,18 @@ namespace accdb_isi
 
                 if (textBoxDBPath.Text != databasePath)
                     textBoxDBPath.Text = databasePath;
+
+                if (!string.IsNullOrEmpty(textBoxTempID.Text))
+                {
+                    if (Convert.ToInt32(textBoxTempID.Text) != tempretureID)
+                        tempretureID = Convert.ToInt32(textBoxTempID.Text);
+                }
+
+                if (!string.IsNullOrEmpty(textBoxTimerID.Text))
+                {
+                    if (Convert.ToInt32(textBoxTimerID.Text) != timerID)
+                        timerID = Convert.ToInt32(textBoxTimerID.Text);
+                }
             }
 
             else if (timeConnected && tempretureConnected)
@@ -538,8 +557,8 @@ namespace accdb_isi
 
         private void button1_Click(object sender, EventArgs e)
         {
-                try
-                {
+            try
+            {
                 // PLC'den veri al
                 string getSicaklik1 = "1";
                 string getSicaklik2 = "2";
@@ -557,7 +576,9 @@ namespace accdb_isi
                 string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
                 int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
                 int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
-                string GetSure = DateTime.Now.Hour.ToString();// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
+
+                // veritabanına sadece zaman bilgisi kaydedilmiyor onun yerine text olarak kaydetmek daha uygun olabilir
+                string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
                 string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
                 string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
 

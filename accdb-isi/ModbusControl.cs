@@ -21,11 +21,11 @@ namespace ModbusController
         private int readTimeout;
         private int writeTimeout;
 
-        public ModbusControl(string address, byte SlaveId, int ReadTimeout = 300, int WriteTimeout = 300)
+        public ModbusControl(string address, int SlaveId, int ReadTimeout = 300, int WriteTimeout = 300)
         {
             RTUConnect(address);
 
-            slaveId = SlaveId;
+            slaveId = Convert.ToByte(SlaveId);
 
             readTimeout = ReadTimeout;
             writeTimeout = WriteTimeout;
