@@ -299,6 +299,7 @@
             this.textBoxTemp1ID.Name = "textBoxTemp1ID";
             this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp1ID.TabIndex = 8;
+            this.textBoxTemp1ID.TextChanged += new System.EventHandler(this.textBoxTemp1ID_TextChanged);
             // 
             // textBoxTimerID
             // 
