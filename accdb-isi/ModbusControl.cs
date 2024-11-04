@@ -16,17 +16,14 @@ namespace ModbusController
         public SerialPort serialPort;
         private IModbusSerialMaster modbusMaster;
 
-        private byte slaveId;
         private ushort startAddress;
 
         private int readTimeout;
         private int writeTimeout;
 
-        public ModbusControl(string address, int SlaveId, int ReadTimeout = 300, int WriteTimeout = 300)
+        public ModbusControl(string address, int ReadTimeout = 300, int WriteTimeout = 300)
         {
             RTUConnect(address);
-
-            slaveId = Convert.ToByte(SlaveId);
 
             readTimeout = ReadTimeout;
             writeTimeout = WriteTimeout;
@@ -113,12 +110,15 @@ namespace ModbusController
             return true;
         }
 
-        public string ReadCoilsData(int CoilAddress, ushort numCoils = 1)
+        public string ReadCoilsData(int SlaveId, int CoilAddress, ushort numCoils = 1)
         {
+            byte slaveId = Convert.ToByte(SlaveId);
             ushort coilAddress = Convert.ToUInt16(CoilAddress);
+            
             bool veriCekildi = false;
             List<string> gelenVeri = new List<string>();
             bool[] coilis;
+            
             string connectionError = TryConnect();
 
             if (!string.IsNullOrEmpty(connectionError))
@@ -145,12 +145,15 @@ namespace ModbusController
             return null;
         }
 
-        public string ReadInputRegsData(int InputAddress, ushort numRegisters = 1)
+        public string ReadInputRegsData(int SlaveId, int InputAddress, ushort numRegisters = 1)
         {
+            byte slaveId = Convert.ToByte(SlaveId);
             ushort inputAddress = Convert.ToUInt16(InputAddress);
+            
             bool veriCekildi = false;
             List<string> gelenVeri = new List<string>();
             ushort[] inputRegisters;
+            
             string connectionError = TryConnect();
             string returnData = null;
 
@@ -181,12 +184,15 @@ namespace ModbusController
             return returnData;
         }
 
-        public string ReadHoldRegsData(int RegAddress, ushort numRegisters = 1)
+        public string ReadHoldRegsData(int SlaveId, int RegAddress, ushort numRegisters = 1)
         {
+            byte slaveId = Convert.ToByte(SlaveId);
             ushort regAddress = Convert.ToUInt16(RegAddress);
+            
             bool veriCekildi = false;
             List<string> gelenVeri = new List<string>();
             ushort[] holdingRegisters;
+            
             string connectionError = TryConnect();
             string returnData = null;
 
@@ -217,10 +223,12 @@ namespace ModbusController
             return returnData;
         }
 
-        public string WriteHoldRegData(int RegAddress, int WriteValue)
+        public string WriteHoldRegData(int SlaveId, int RegAddress, int WriteValue)
         {
+            byte slaveId = Convert.ToByte(SlaveId);
             ushort regAddress = Convert.ToUInt16(RegAddress);
             ushort writeValue = Convert.ToUInt16(WriteValue);
+
             string connectionError = TryConnect();
 
             if (!string.IsNullOrEmpty(connectionError))
@@ -241,9 +249,11 @@ namespace ModbusController
             return null;
         }
 
-        public string WriteCoilData(int CoilAddress, bool writeValue)
+        public string WriteCoilData(int SlaveId, int CoilAddress, bool writeValue)
         {
+            byte slaveId = Convert.ToByte(SlaveId);
             ushort coilAddress = Convert.ToUInt16(CoilAddress);
+            
             string connectionError = TryConnect();
 
             if (!string.IsNullOrEmpty(connectionError))

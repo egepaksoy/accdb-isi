@@ -20,9 +20,7 @@ namespace accdb_isi
     public partial class Form1 : Form
     {
         DatabaseControl databaseControl;
-        ModbusControl tempretureDevice1;
-        ModbusControl tempretureDevice2;
-        ModbusControl timeDevice;
+        ModbusControl modbusControl;
 
         string databasePath = string.Empty;
         string modbusPort = string.Empty;
@@ -41,16 +39,14 @@ namespace accdb_isi
         int SetSure = 0;
         
         bool dbConnected = false;
-        bool tempreture1Connected = false;
-        bool tempreture2Connected = false;
-        bool timeConnected = false;
+        bool modbusConnected = false;
+        
         bool started = false;
         bool btnClicked = false;
 
         public Form1()
         {
             InitializeComponent();
-            // bu değişkenleri ayarlardan çek
             databaseControl = new DatabaseControl(databasePath);
         }
 
@@ -95,9 +91,7 @@ namespace accdb_isi
 
                 try
                 {
-                    tempretureDevice1 = new ModbusControl(modbusPort, tempreture1ID);
-                    tempretureDevice2 = new ModbusControl(modbusPort, tempreture2ID);
-                    timeDevice = new ModbusControl(modbusPort, timerID);
+                    modbusControl = new ModbusControl(modbusPort);
                 }
                 catch (Exception ex)
                 {
@@ -105,59 +99,20 @@ namespace accdb_isi
                     return;
                 }
 
-                if (!timeConnected)
-                    if (timeDevice.ConnectPlc() == null)
-                        timeConnected = true;
+                if (!modbusConnected)
+                    if (modbusControl.ConnectPlc() == null)
+                        modbusConnected = true;
 
-                if (!tempreture1Connected)
-                    if (tempretureDevice1.ConnectPlc() == null)
-                        tempreture1Connected = true;
-
-                if (!tempreture2Connected)
-                    if (tempretureDevice2.ConnectPlc() == null)
-                        tempreture2Connected = true;
-
-                if (tempreture1Connected != timeConnected || tempreture2Connected != timeConnected || tempreture2Connected != tempreture1Connected)
-                {
-                    tempreture1Connected = !tempretureDevice1.DisconnectPlc();
-                    tempreture2Connected = !tempretureDevice2.DisconnectPlc();
-                    timeConnected = !timeDevice.DisconnectPlc();
-                }
-
-                if (tempreture1Connected == timeConnected == tempreture2Connected)
-                    ConnectionController();
+                ConnectionController();
             }
             else
             {
-                if (tempreture1Connected)
-                    tempretureDevice1.DisconnectPlc();
-                if (tempreture2Connected)
-                    tempretureDevice2.DisconnectPlc();
-                if (timeConnected)
-                    timeDevice.DisconnectPlc();
+                if (modbusConnected)
+                    modbusConnected = !modbusControl.DisconnectPlc();
 
-                tempretureDevice1 = null;
-                tempretureDevice2 = null;
-                timeDevice = null;
+                modbusControl = null;
 
-                if (timeConnected)
-                    timeConnected = !timeDevice.DisconnectPlc();
-
-                if (tempreture1Connected)
-                    tempreture1Connected = !tempretureDevice1.DisconnectPlc();
-
-                if (tempreture2Connected)
-                    tempreture2Connected = !tempretureDevice2.DisconnectPlc();
-
-                if (tempreture1Connected != timeConnected || tempreture2Connected != timeConnected || tempreture2Connected != tempreture1Connected)
-                {
-                    tempreture1Connected = !tempretureDevice1.DisconnectPlc();
-                    tempreture2Connected = !tempretureDevice2.DisconnectPlc();
-                    timeConnected = !timeDevice.DisconnectPlc();
-                }
-
-                if (tempreture1Connected == timeConnected == tempreture2Connected)
-                    ConnectionController();
+                ConnectionController();
             }
         }
 
@@ -204,7 +159,7 @@ namespace accdb_isi
 
         private void LabelModbusConnected()
         {
-            if (tempreture1Connected && timeConnected && tempreture2Connected)
+            if (modbusConnected)
             {
                 labelModbusConnected.Text = "Modbus Bağlı";
                 labelModbusConnected.ForeColor = Color.Green;
@@ -296,8 +251,8 @@ namespace accdb_isi
                 try
                 {
                     // PLC'den veri al
-                    string getSicaklik1 = tempretureDevice1.ReadHoldRegsData((int)HoldRegAddresses.Sicaklik1);
-                    string getSicaklik2 = tempretureDevice2.ReadHoldRegsData((int)HoldRegAddresses.Sicaklik2);
+                    string getSicaklik1 = modbusControl.ReadHoldRegsData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1);
+                    string getSicaklik2 = modbusControl.ReadHoldRegsData(tempreture2ID, (int)HoldRegAddresses.Sicaklik2);
 
                     if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
                     {
@@ -396,12 +351,12 @@ namespace accdb_isi
                 }
             }
 
-            else if (timeConnected && tempreture1Connected && tempreture2Connected)
+            else if (modbusConnected)
             {
                 try
                 {
-                    string getSicaklik1 = tempretureDevice1.ReadHoldRegsData((int)HoldRegAddresses.Sicaklik1);
-                    string getSicaklik2 = tempretureDevice1.ReadHoldRegsData((int)HoldRegAddresses.Sicaklik2);
+                    string getSicaklik1 = modbusControl.ReadHoldRegsData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1);
+                    string getSicaklik2 = modbusControl.ReadHoldRegsData(tempreture2ID, (int)HoldRegAddresses.Sicaklik2);
 
                     if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
                     {
@@ -452,7 +407,7 @@ namespace accdb_isi
             string timerData = string.Empty;
             int timerInterval = 100;
 
-            if (dbConnected && timeConnected && tempreture1Connected && tempreture2Connected)
+            if (dbConnected && modbusConnected)
             {
                 SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1").Split(':')[1].Trim());
                 SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2").Split(':')[1].Trim());
@@ -464,9 +419,9 @@ namespace accdb_isi
                 try
                 {
                     //! modbus cihazı olmadığında burası veri yazmada sıkıntı cıkarıyor
-                    string temp1Err = tempretureDevice1.WriteHoldRegData((int)HoldRegAddresses.Sicaklik1, SetSicaklik1);
-                    string temp2Err = tempretureDevice2.WriteHoldRegData((int)HoldRegAddresses.Sicaklik2, SetSicaklik2);
-                    string timerErr = timeDevice.WriteHoldRegData((int)HoldRegAddresses.Timer, SetSure);
+                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1, SetSicaklik1);
+                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.Sicaklik2, SetSicaklik2);
+                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.Timer, SetSure);
 
                     if (timerErr != null || temp1Err != null || temp2Err != null)
                     {
@@ -537,7 +492,7 @@ namespace accdb_isi
             {
                 ConnectDB(true);
                 ConnectModbus(true);
-                if (!(dbConnected && timeConnected && tempreture1Connected && tempreture2Connected))
+                if (!(dbConnected && modbusConnected))
                     return;
 
                 btnStart.Text = "Durdur";
@@ -634,14 +589,10 @@ namespace accdb_isi
                     timerID = Convert.ToInt32(textBoxTimerID.Text);
             }
 
-            ModbusControl tester1 = new ModbusControl("com3", tempreture1ID);
-            //ModbusControl tester2 = new ModbusControl("com3", tempreture2ID);
-            //ModbusControl tester3 = new ModbusControl("com3", timerID);
+            ModbusControl tester1 = new ModbusControl("com3");
 
             tester1.ConnectPlc();
-            //tester2.ConnectPlc();
-            //tester3.ConnectPlc();
-            //! tek bağlanıt uzerinden farklı slave adresleri ile yap
+            MessageBox.Show(tester1.ReadHoldRegsData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1));
         }
     }
 }
