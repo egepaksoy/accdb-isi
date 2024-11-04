@@ -247,7 +247,7 @@ namespace DatabaseController
         /// <param name="TableName">Tablo adı.</param>
         /// <param name="rows">Tablodaki columnlar (* verilince hepsi).</param>
         /// <returns>string "ColumnAdı:ColumnDeğeri\n"</returns>
-        public string GetData(string TableName, string rows, int tableId = 1)
+        public string GetData(string TableName, string rows, int tableId = 2)
         {
             string returnData = "";
             string query = $"SELECT {rows} FROM {TableName} WHERE PressDataID = {tableId}";

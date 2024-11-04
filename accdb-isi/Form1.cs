@@ -13,6 +13,7 @@ using ModbusController;
 using Addresses;
 using System.IO.Ports;
 using System.Diagnostics.Eventing.Reader;
+using System.Runtime.CompilerServices;
 
 
 namespace accdb_isi
@@ -32,6 +33,7 @@ namespace accdb_isi
 
         string operatorName = string.Empty;
         string makineName = string.Empty;
+        string TimerTime = string.Empty;
         int SetSicaklik1 = 0;
         int SetSicaklik2 = 0;
         int GetSicaklik1 = 0;
@@ -43,6 +45,8 @@ namespace accdb_isi
         
         bool started = false;
         bool btnClicked = false;
+
+        DateTime pressStartTime = DateTime.MinValue;
 
         public Form1()
         {
@@ -78,37 +82,45 @@ namespace accdb_isi
         {
             if (connect)
             {
-                if (modbusPort == string.Empty)
-                {
-                    MessageBox.Show("Ayarlardan modbus cihazı yolunu seçin");
-                    return;
-                }
-                if (tempreture1ID < 0 || timerID < 0 || tempreture2ID < 0)
-                {
-                    MessageBox.Show("Ayarlardan modbus cihazlarının slave idlerini girin");
-                    return;
-                }
-
-                try
-                {
-                    modbusControl = new ModbusControl(modbusPort);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Modbus bağlantı hatası: " + ex.Message);
-                    return;
-                }
-
                 if (!modbusConnected)
+                {
+                    if (modbusPort == string.Empty)
+                    {
+                        MessageBox.Show("Ayarlardan modbus cihazı yolunu seçin");
+                        return;
+                    }
+                    if (tempreture1ID < 0 || timerID < 0 || tempreture2ID < 0)
+                    {
+                        MessageBox.Show("Ayarlardan modbus cihazlarının slave idlerini girin");
+                        return;
+                    }
+
+                    try
+                    {
+                        modbusControl = new ModbusControl(modbusPort);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Modbus bağlantı hatası: " + ex.Message);
+                        return;
+                    }
+
                     if (modbusControl.ConnectPlc() == null)
+                    {
                         modbusConnected = true;
+                        generalTimer.Enabled = true;
+                    }
+                }
 
                 ConnectionController();
             }
             else
             {
                 if (modbusConnected)
+                {
                     modbusConnected = !modbusControl.DisconnectPlc();
+                    generalTimer.Enabled = false;
+                }
 
                 modbusControl = null;
 
@@ -220,8 +232,6 @@ namespace accdb_isi
                     timerInterval = Convert.ToInt32(timerData.Split(':')[1].Trim()) * 1000;
                 else
                     MessageBox.Show("Veritabanında süre okuma bilgisi yok");
-
-                UpdateLabels(true);
             }
             else
             {
@@ -237,7 +247,6 @@ namespace accdb_isi
 
                 writeDBTimer.Interval = 100;
                 writeDBTimer.Enabled = false;
-                UpdateLabels(false);
             }
 
             LabelDBConnected();
@@ -251,8 +260,13 @@ namespace accdb_isi
                 try
                 {
                     // PLC'den veri al
-                    string getSicaklik1 = modbusControl.ReadHoldRegsData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1);
-                    string getSicaklik2 = modbusControl.ReadHoldRegsData(tempreture2ID, (int)HoldRegAddresses.Sicaklik2);
+                    string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
+                    string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
+
+                    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timer1Value);
+
+                    TimerTime = ConvertTimer(timerTime, timerFormat);
 
                     if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
                     {
@@ -267,9 +281,9 @@ namespace accdb_isi
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
                     int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
-                    string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
-                    string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
-                    string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
+                    string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");//! pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
+                    string GetStartTime = pressStartTime.ToString();// press başlama zamanı (başlata basınca gelen zaman)
+                    string GetFinishTime = pressStartTime.ToString();// press bitiş zaman (başlangıç + GetSure değeri
 
                     string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
                     if (!string.IsNullOrEmpty(errMessage))
@@ -287,6 +301,41 @@ namespace accdb_isi
                 }
                 
             }
+        }
+
+        private string ConvertTimer(string timerTime, string timerFormat)
+        {
+            double hour = 0;
+            double minute = 0;
+            double second = 0;
+
+            if (timerFormat == "0")
+                second = Convert.ToInt32(timerTime) / 100.0;
+            else if (timerFormat == "1")
+                second = Convert.ToInt32(timerTime) / 10.0;
+            else if (timerFormat == "2")
+                second = Convert.ToDouble(timerTime);
+            else if (timerFormat == "3")
+            {
+                minute = Convert.ToInt32(Convert.ToInt32(timerTime) / 100.0);
+                second = Convert.ToInt32(timerTime) % 100;
+            }
+            else if (timerFormat == "4")
+                minute = Convert.ToInt32(timerTime) / 10.0;
+            else if (timerFormat == "5")
+                minute = Convert.ToDouble(timerTime);
+            else if (timerFormat == "6")
+            {
+                hour = Convert.ToInt32(Convert.ToInt32(timerTime) / 100.0);
+                minute = Convert.ToInt32(timerTime) % 100;
+            }
+            else if (timerFormat == "7")
+                hour = Convert.ToInt32(timerTime) / 10.0;
+            else if (timerFormat == "8")
+                hour = Convert.ToDouble(timerTime);
+
+            //! burda saniye 1000 saniye olursa ne olur
+            return $"{hour}:{minute}:{second}";
         }
 
         private void btnClearLogs_Click(object sender, EventArgs e)
@@ -355,8 +404,8 @@ namespace accdb_isi
             {
                 try
                 {
-                    string getSicaklik1 = modbusControl.ReadHoldRegsData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1);
-                    string getSicaklik2 = modbusControl.ReadHoldRegsData(tempreture2ID, (int)HoldRegAddresses.Sicaklik2);
+                    string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
+                    string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
 
                     if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
                     {
@@ -405,7 +454,7 @@ namespace accdb_isi
         public void FirstStart()
         {
             string timerData = string.Empty;
-            int timerInterval = 100;
+            int timerInterval = 10000;
 
             if (dbConnected && modbusConnected)
             {
@@ -419,19 +468,22 @@ namespace accdb_isi
                 try
                 {
                     //! modbus cihazı olmadığında burası veri yazmada sıkıntı cıkarıyor
-                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1, SetSicaklik1);
-                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.Sicaklik2, SetSicaklik2);
-                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.Timer, SetSure);
+                    //! adresleri duzenle
+                    //! bunlar gerekli mi?
+                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.sicaklik1, SetSicaklik1);
+                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.sicaklik1, SetSicaklik2);
+                    //! setsurey'yi modbus formatında yaz
+                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.t1Value, SetSure);
 
                     if (timerErr != null || temp1Err != null || temp2Err != null)
                     {
-                        MessageBox.Show("Modbus cihazlarına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
+                        MessageBox.Show("Modbus cihazına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
                         return;
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Modbus cihazlarına veri yazma hatası: " + ex.Message);
+                    MessageBox.Show("Modbus cihazına veri yazma hatası: " + ex.Message);
                     return;
                 }
 
@@ -441,44 +493,42 @@ namespace accdb_isi
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Veri çekme hatası: " + ex.Message);
-                    return;
+                    MessageBox.Show("Zamanla yazma hatası: " + ex.Message + $"\nSistem {timerInterval/1000} saniyede bir veri yazıcak");
+                    timerData = string.Empty;
                 }
 
                 if (timerData != string.Empty)
                     timerInterval = Convert.ToInt32(timerData.Split(':')[1].Trim()) * 1000;
-                else
-                {
-                    MessageBox.Show("Veritabanında süre okuma bilgisi yok");
-                    return;
-                }
 
                 writeDBTimer.Interval = timerInterval;
                 writeDBTimer.Enabled = true;
+
+                writerController.Interval = SetSure * 1000;
+                writerController.Enabled = true;
+
+                pressStartTime = DateTime.Now;
 
                 UpdateLabels(true);
             }
         }
 
+        private void StopModbus()
+        {
+            //! modbusları durdur
+        }
+
         private void EndProcess()
         {
-            operatorName = string.Empty;
-            makineName = string.Empty;
-            SetSicaklik1 = 0;
-            SetSicaklik2 = 0;
-
-            operatorLabel.Text = "Operatör:";
-            makineLabel.Text = "Makine:";
-            hedefSicaklik1.Text = "Hedef Sıcaklık:";
-            hedefSicaklik2.Text = "Hedef Sıcaklık:";
+            StopModbus();
+            writerController.Stop();
+            writerController.Enabled = false;
+            writerController.Interval = 100;
 
             writeDBTimer.Interval = 100;
             writeDBTimer.Enabled = false;
 
             btnConnectDB.Enabled = true;
             btnConnectModbus.Enabled = true;
-
-            UpdateLabels(false);
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -493,7 +543,10 @@ namespace accdb_isi
                 ConnectDB(true);
                 ConnectModbus(true);
                 if (!(dbConnected && modbusConnected))
+                {
+                    MessageBox.Show("Veritabanına veya PLC bağlantısı sağlanılamadı");
                     return;
+                }
 
                 btnStart.Text = "Durdur";
                 btnStart.BackColor = Color.Red;
@@ -504,9 +557,6 @@ namespace accdb_isi
             }
             else
             {
-                ConnectDB(false);
-                ConnectModbus(false);
-
                 btnStart.Text = "Başlat";
                 btnStart.BackColor = Color.Lime;
                 btnStart.ForeColor = Color.Black;
@@ -550,8 +600,8 @@ namespace accdb_isi
 
                 // veritabanına sadece zaman bilgisi kaydedilmiyor onun yerine text olarak kaydetmek daha uygun olabilir
                 string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
-                string GetStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press başlama zamanı
-                string GetFinishTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman
+                string GetStartTime = pressStartTime.ToString();// press başlama zamanı (başlata basınca gelen zaman)
+                string GetFinishTime = pressStartTime.ToString();// press bitiş zaman (başlangıç + GetSure değeri
 
                 string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
                 if (!string.IsNullOrEmpty(errMessage))
@@ -569,30 +619,10 @@ namespace accdb_isi
             }
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void writerController_Tick(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textBoxTemp1ID.Text))
-            {
-                if (Convert.ToInt32(textBoxTemp1ID.Text) != tempreture1ID)
-                    tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
-            }
-
-            if (!string.IsNullOrEmpty(textBoxTemp2ID.Text))
-            {
-                if (Convert.ToInt32(textBoxTemp2ID.Text) != tempreture2ID)
-                    tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
-            }
-
-            if (!string.IsNullOrEmpty(textBoxTimerID.Text))
-            {
-                if (Convert.ToInt32(textBoxTimerID.Text) != timerID)
-                    timerID = Convert.ToInt32(textBoxTimerID.Text);
-            }
-
-            ModbusControl tester1 = new ModbusControl("com3");
-
-            tester1.ConnectPlc();
-            MessageBox.Show(tester1.ReadHoldRegsData(tempreture1ID, (int)HoldRegAddresses.Sicaklik1));
+            MessageBox.Show("İşlem tamamlandı");
+            EndProcess();
         }
     }
 }

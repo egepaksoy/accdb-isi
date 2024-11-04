@@ -8,14 +8,17 @@ namespace Addresses
 {
     internal enum HoldRegAddresses
     {
-        Sicaklik1 = 0,
-        Sicaklik2 = 1,
-        Timer = 0,
+        sicaklik1 = 0,
+        sicaklik2 = 1,
+        
+        t1Value = 0,
+        t1AValue = 1,
+        timerFormat = 2,
     }
     internal enum InputRegAddresses
     {
-        timer1 = 0,
-        timer2 = 1,
+        timer1Value = 0,
+        timer2Value = 1,
 
         olculenSicaklik = 0,
         setSicaklik = 4,

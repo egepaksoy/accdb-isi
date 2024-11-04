@@ -59,7 +59,7 @@
             this.textBoxDBPath = new System.Windows.Forms.TextBox();
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.writerController = new System.Windows.Forms.Timer(this.components);
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -206,7 +206,6 @@
             // 
             // generalTimer
             // 
-            this.generalTimer.Enabled = true;
             this.generalTimer.Interval = 800;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
@@ -235,7 +234,6 @@
             // 
             // tabIslemler
             // 
-            this.tabIslemler.Controls.Add(this.button1);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
             this.tabIslemler.Controls.Add(this.makineLabel);
             this.tabIslemler.Controls.Add(this.btnStart);
@@ -371,15 +369,9 @@
             this.labelDatabase.TabIndex = 0;
             this.labelDatabase.Text = "Veritabanı Yolu:";
             // 
-            // button1
+            // writerController
             // 
-            this.button1.Location = new System.Drawing.Point(307, 379);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.writerController.Tick += new System.EventHandler(this.writerController_Tick);
             // 
             // Form1
             // 
@@ -430,7 +422,7 @@
         private System.Windows.Forms.TextBox textBoxTimerID;
         private System.Windows.Forms.TextBox textBoxTemp2ID;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Timer writerController;
     }
 }
 
