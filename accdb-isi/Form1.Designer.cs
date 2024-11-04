@@ -59,6 +59,7 @@
             this.textBoxDBPath = new System.Windows.Forms.TextBox();
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -234,6 +235,7 @@
             // 
             // tabIslemler
             // 
+            this.tabIslemler.Controls.Add(this.button1);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
             this.tabIslemler.Controls.Add(this.makineLabel);
             this.tabIslemler.Controls.Add(this.btnStart);
@@ -299,7 +301,6 @@
             this.textBoxTemp1ID.Name = "textBoxTemp1ID";
             this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp1ID.TabIndex = 8;
-            this.textBoxTemp1ID.TextChanged += new System.EventHandler(this.textBoxTemp1ID_TextChanged);
             // 
             // textBoxTimerID
             // 
@@ -370,6 +371,16 @@
             this.labelDatabase.TabIndex = 0;
             this.labelDatabase.Text = "Veritabanı Yolu:";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(307, 379);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -419,6 +430,7 @@
         private System.Windows.Forms.TextBox textBoxTimerID;
         private System.Windows.Forms.TextBox textBoxTemp2ID;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button button1;
     }
 }
 

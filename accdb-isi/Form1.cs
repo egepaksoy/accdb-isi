@@ -614,9 +614,34 @@ namespace accdb_isi
             }
         }
 
-        private void textBoxTemp1ID_TextChanged(object sender, EventArgs e)
+        private void button1_Click_1(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(textBoxTemp1ID.Text))
+            {
+                if (Convert.ToInt32(textBoxTemp1ID.Text) != tempreture1ID)
+                    tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
+            }
 
+            if (!string.IsNullOrEmpty(textBoxTemp2ID.Text))
+            {
+                if (Convert.ToInt32(textBoxTemp2ID.Text) != tempreture2ID)
+                    tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
+            }
+
+            if (!string.IsNullOrEmpty(textBoxTimerID.Text))
+            {
+                if (Convert.ToInt32(textBoxTimerID.Text) != timerID)
+                    timerID = Convert.ToInt32(textBoxTimerID.Text);
+            }
+
+            ModbusControl tester1 = new ModbusControl("com3", tempreture1ID);
+            //ModbusControl tester2 = new ModbusControl("com3", tempreture2ID);
+            //ModbusControl tester3 = new ModbusControl("com3", timerID);
+
+            tester1.ConnectPlc();
+            //tester2.ConnectPlc();
+            //tester3.ConnectPlc();
+            //! tek bağlanıt uzerinden farklı slave adresleri ile yap
         }
     }
 }

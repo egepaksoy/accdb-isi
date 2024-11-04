@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Windows.Forms;
 using NModbus;
 using NModbus.IO;
@@ -50,20 +51,22 @@ namespace ModbusController
 
         public string ConnectPlc()
         {
-            SetTimeout(writeTimeout, readTimeout);
+            if (!SetTimeout(writeTimeout, readTimeout))
+                MessageBox.Show("Timeout Ayarlanamadı");
 
             try
             {
+                serialPort.Close();
                 serialPort.Open();
-                if (serialPort.IsOpen)
-                    return null;
             }
             catch (TimeoutException e)
             {
+                MessageBox.Show("Timout Error: " + e.Message);
                 return e.Message;
             }
             catch (Exception e)
             {
+                MessageBox.Show("Error: " + e.Message);
                 return e.Message;
             }
             return null;
