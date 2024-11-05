@@ -39,6 +39,8 @@ namespace accdb_isi
         int GetSicaklik1 = 0;
         int GetSicaklik2 = 0;
         int SetSure = 0;
+
+        int setTableID = -1;
         
         bool dbConnected = false;
         bool modbusConnected = false;
@@ -106,26 +108,17 @@ namespace accdb_isi
                     }
 
                     if (modbusControl.ConnectPlc() == null)
-                    {
                         modbusConnected = true;
-                        generalTimer.Enabled = true;
-                    }
                 }
-
-                ConnectionController();
             }
             else
             {
                 if (modbusConnected)
-                {
                     modbusConnected = !modbusControl.DisconnectPlc();
-                    generalTimer.Enabled = false;
-                }
 
                 modbusControl = null;
-
-                ConnectionController();
             }
+            ConnectionController();
         }
 
         private void ConnectDB(bool connect)
@@ -137,6 +130,15 @@ namespace accdb_isi
                     MessageBox.Show("Ayarlardan veritabanı seçin");
                     return;
                 }
+
+                if (string.IsNullOrEmpty(textBoxSetTableID.Text) || !decimal.TryParse(textBoxSetTableID.Text, out decimal res))
+                {
+                    MessageBox.Show("Ayarlardan set tablosunun id'sini seçin");
+                    return;
+                }
+
+                else if (!string.IsNullOrEmpty(textBoxSetTableID.Text) && decimal.TryParse(textBoxSetTableID.Text, out decimal result))
+                    setTableID = Convert.ToInt32(textBoxSetTableID.Text);
 
                 if (!dbConnected)
                 {
@@ -211,12 +213,12 @@ namespace accdb_isi
 
                 try
                 {
-                    timerData = databaseControl.GetData("tblservertopres", "SetOrnekAraligi");
+                    timerData = databaseControl.GetData("tblservertopres", "SetOrnekAraligi", setTableID);
 
-                    operatorName = databaseControl.GetData("tblservertopres", "operator").Split(':')[1].Trim();
-                    makineName = databaseControl.GetData("tblservertopres", "makine").Split(':')[1].Trim();
-                    SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1").Split(':')[1].Trim());
-                    SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2").Split(':')[1].Trim());
+                    operatorName = databaseControl.GetData("tblservertopres", "operator", setTableID).Split(':')[1].Trim();
+                    makineName = databaseControl.GetData("tblservertopres", "makine", setTableID).Split(':')[1].Trim();
+                    SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1", setTableID).Split(':')[1].Trim());
+                    SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
                 }
                 catch (Exception ex)
                 {
@@ -278,7 +280,7 @@ namespace accdb_isi
                     GetSicaklik1 = Convert.ToInt32(getSicaklik1);
                     GetSicaklik2 = Convert.ToInt32(getSicaklik2);
 
-                    string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
+                    string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
                     int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
                     string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");//! pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
@@ -400,7 +402,7 @@ namespace accdb_isi
                 }
             }
 
-            else if (modbusConnected)
+            if (modbusConnected)
             {
                 try
                 {
@@ -458,9 +460,9 @@ namespace accdb_isi
 
             if (dbConnected && modbusConnected)
             {
-                SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1").Split(':')[1].Trim());
-                SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2").Split(':')[1].Trim());
-                SetSure = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSure").Split(':')[1].Trim());
+                SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1", setTableID).Split(':')[1].Trim());
+                SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
+                SetSure = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSure", setTableID).Split(':')[1].Trim());
 
                 btnConnectDB.Enabled = false;
                 btnConnectModbus.Enabled = false;
@@ -489,7 +491,7 @@ namespace accdb_isi
 
                 try
                 {
-                    timerData = databaseControl.GetData("tblservertopres", "SetOrnekAraligi");
+                    timerData = databaseControl.GetData("tblservertopres", "SetOrnekAraligi", setTableID);
                 }
                 catch (Exception ex)
                 {
@@ -574,49 +576,6 @@ namespace accdb_isi
         private void comboBoxModbusConn_SelectionChangeCommited(object sender, EventArgs e)
         {
             modbusPort = comboBoxModbusConn.SelectedItem.ToString();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // PLC'den veri al
-                string getSicaklik1 = "1";
-                string getSicaklik2 = "2";
-
-                if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
-                {
-                    ProcessController(false);
-                    MessageBox.Show("Modbus cihazlarından veri alma sorunu");
-                    return;
-                }
-
-                GetSicaklik1 = Convert.ToInt32(getSicaklik1);
-                GetSicaklik2 = Convert.ToInt32(getSicaklik2);
-
-                string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile").Split(':')[1].Trim();
-                int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
-                int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
-
-                // veritabanına sadece zaman bilgisi kaydedilmiyor onun yerine text olarak kaydetmek daha uygun olabilir
-                string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");// pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
-                string GetStartTime = pressStartTime.ToString();// press başlama zamanı (başlata basınca gelen zaman)
-                string GetFinishTime = pressStartTime.ToString();// press bitiş zaman (başlangıç + GetSure değeri
-
-                string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
-                if (!string.IsNullOrEmpty(errMessage))
-                {
-                    ProcessController(false);
-                    MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + errMessage);
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                ProcessController(false);
-                MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + ex.Message);
-                return;
-            }
         }
 
         private void writerController_Tick(object sender, EventArgs e)

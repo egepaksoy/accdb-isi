@@ -60,6 +60,8 @@
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
             this.writerController = new System.Windows.Forms.Timer(this.components);
+            this.textBoxSetTableID = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -123,7 +125,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(146, 16);
             this.label1.TabIndex = 5;
-            this.label1.Text = "Press Sıcaklık Değeri 1";
+            this.label1.Text = "Press 1 Sıcaklık Değeri";
             // 
             // label2
             // 
@@ -133,7 +135,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(146, 16);
             this.label2.TabIndex = 6;
-            this.label2.Text = "Press Sıcaklık Değeri 2";
+            this.label2.Text = "Press 2 Sıcaklık Değeri";
             // 
             // writeDBTimer
             // 
@@ -206,6 +208,7 @@
             // 
             // generalTimer
             // 
+            this.generalTimer.Enabled = true;
             this.generalTimer.Interval = 800;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
@@ -258,6 +261,8 @@
             // 
             // tabAyarlar
             // 
+            this.tabAyarlar.Controls.Add(this.textBoxSetTableID);
+            this.tabAyarlar.Controls.Add(this.label5);
             this.tabAyarlar.Controls.Add(this.textBoxTemp2ID);
             this.tabAyarlar.Controls.Add(this.label4);
             this.tabAyarlar.Controls.Add(this.textBoxTemp1ID);
@@ -373,6 +378,22 @@
             // 
             this.writerController.Tick += new System.EventHandler(this.writerController_Tick);
             // 
+            // textBoxSetTableID
+            // 
+            this.textBoxSetTableID.Location = new System.Drawing.Point(233, 161);
+            this.textBoxSetTableID.Name = "textBoxSetTableID";
+            this.textBoxSetTableID.Size = new System.Drawing.Size(100, 20);
+            this.textBoxSetTableID.TabIndex = 12;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(150, 164);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(77, 13);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "Set tablosu ID:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -423,6 +444,8 @@
         private System.Windows.Forms.TextBox textBoxTemp2ID;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Timer writerController;
+        private System.Windows.Forms.TextBox textBoxSetTableID;
+        private System.Windows.Forms.Label label5;
     }
 }
 
