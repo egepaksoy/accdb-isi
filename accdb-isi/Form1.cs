@@ -48,7 +48,7 @@ namespace accdb_isi
         bool started = false;
         bool btnClicked = false;
 
-        DateTime pressStartTime = DateTime.MinValue;
+        string pressStartTime = string.Empty;
 
         public Form1()
         {
@@ -261,31 +261,30 @@ namespace accdb_isi
             {
                 try
                 {
-                    // PLC'den veri al
                     string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
                     string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
 
                     string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
-                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timer1Value);
+                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
 
-                    TimerTime = ConvertTimer(timerTime, timerFormat);
-
-                    if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
+                    if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2) || string.IsNullOrEmpty(timerFormat) || string.IsNullOrEmpty(timerTime))
                     {
                         ProcessController(false);
                         MessageBox.Show("Modbus cihazlarından veri alma sorunu");
                         return;
                     }
 
+                    TimerTime = ConvertTimer(timerTime, timerFormat);
+
                     GetSicaklik1 = Convert.ToInt32(getSicaklik1);
                     GetSicaklik2 = Convert.ToInt32(getSicaklik2);
 
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
-                    int Sicaklik1 = GetSicaklik1;// press sıcaklık 1
-                    int Sicaklik2 = GetSicaklik2;// press sıcaklık 2
-                    string GetSure = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");//! pressten okunan zaman (modbus cihazındaki formatı datetime formatına convert edilmeli)
-                    string GetStartTime = pressStartTime.ToString();// press başlama zamanı (başlata basınca gelen zaman)
-                    string GetFinishTime = pressStartTime.ToString();// press bitiş zaman (başlangıç + GetSure değeri
+                    int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
+                    int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
+                    string GetSure = TimerTime;// timer zamani
+                    string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
+                    string GetFinishTime = (TimeSpan.Parse(pressStartTime) + TimeSpan.Parse(TimerTime)).ToString();// press bitiş zaman (başlangıç + SetSure değeri)
 
                     string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
                     if (!string.IsNullOrEmpty(errMessage))
@@ -305,12 +304,22 @@ namespace accdb_isi
             }
         }
 
-        private string ConvertTimer(string timerTime, string timerFormat)
+        private string ConvertTimer(string TimerTime, string timerFormat)
         {
             double hour = 0;
             double minute = 0;
             double second = 0;
+            string timerTime = "";
 
+            // plc zamanını 4 haneli yapma
+            if (timerTime.Length != 4)
+            {
+                for (int i = 0; i < timerTime.Length - 4; i++)
+                    timerTime += "0";
+                timerTime += TimerTime;
+            }
+
+            // plc zaman formatını normal saat:dakika:saniye formatına dondurme
             if (timerFormat == "0")
                 second = Convert.ToInt32(timerTime) / 100.0;
             else if (timerFormat == "1")
@@ -336,7 +345,22 @@ namespace accdb_isi
             else if (timerFormat == "8")
                 hour = Convert.ToDouble(timerTime);
 
-            //! burda saniye 1000 saniye olursa ne olur
+            // 60 dakika formatında dondurme
+            if (second >= 60)
+            {
+                minute += Convert.ToInt32(second / 60);
+                second %= 60;
+            }
+            if (minute >= 60)
+            {
+                hour += Convert.ToInt32(minute / 60);
+                minute %= 60;
+            }
+
+            hour = Convert.ToInt32(hour);
+            minute = Convert.ToInt32(minute);
+            second = Convert.ToInt32(second);
+
             return $"{hour}:{minute}:{second}";
         }
 
@@ -453,6 +477,71 @@ namespace accdb_isi
             }
         }
 
+        public int ConvertToPLC(int setSure, string format)
+        {
+            if (format == "0")
+            {
+                if (setSure >= 100)
+                {
+                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
+                    return -1;
+                }
+                else if (setSure < 100)
+                    return setSure * 100;
+            }
+            if (format == "1")
+            {
+                if (setSure >= 1000)
+                {
+                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
+                    return -1;
+                }
+                else if (setSure < 1000)
+                    return setSure * 10;
+            }
+            if (format == "2")
+            {
+                if (setSure >= 10000)
+                {
+                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
+                    return -1;
+                }
+                else if (setSure < 10000)
+                    return setSure;
+            }
+            if (format == "3")
+            {
+                if (setSure >= 6000)
+                {
+                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
+                    return -1;
+                }
+                else if (setSure < 6000)
+                    return Convert.ToInt32(setSure / 60) * 100 + setSure % 60;
+            }
+            if (format == "4")
+            {
+                if (setSure >= 60000)
+                {
+                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
+                    return -1;
+                }
+                else if (SetSure < 60000)
+                    return Convert.ToInt32(setSure / 60) * 10 + Convert.ToInt32((setSure / 60 - Convert.ToInt32(setSure / 60)) * 10);
+            }
+            if (format == "5")
+            {
+                if (setSure >= 600000)
+                {
+                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
+                    return -1;
+                }
+                else if (setSure < 600000)
+                    return Convert.ToInt32(setSure / 60);
+            }
+            return -1;
+        }
+
         public void FirstStart()
         {
             string timerData = string.Empty;
@@ -469,13 +558,19 @@ namespace accdb_isi
 
                 try
                 {
-                    //! modbus cihazı olmadığında burası veri yazmada sıkıntı cıkarıyor
-                    //! adresleri duzenle
-                    //! bunlar gerekli mi?
-                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.sicaklik1, SetSicaklik1);
-                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.sicaklik1, SetSicaklik2);
+                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
+                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
+
                     //! setsurey'yi modbus formatında yaz
-                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.t1Value, SetSure);
+                    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat).Split(':')[0];
+                    if (timerFormat == null)
+                        return;
+
+                    int timerTime = ConvertToPLC(SetSure, timerFormat);
+                    if (timerTime == -1)
+                        return;
+
+                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, SetSure);
 
                     if (timerErr != null || temp1Err != null || temp2Err != null)
                     {
@@ -508,7 +603,7 @@ namespace accdb_isi
                 writerController.Interval = SetSure * 1000;
                 writerController.Enabled = true;
 
-                pressStartTime = DateTime.Now;
+                pressStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 UpdateLabels(true);
             }
@@ -582,6 +677,16 @@ namespace accdb_isi
         {
             MessageBox.Show("İşlem tamamlandı");
             EndProcess();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ConnectDB(true);
+            string time = ConvertTimer("1245", "0");
+            TimeSpan sure = TimeSpan.Parse(time);
+            TimeSpan baslangicsure = TimeSpan.Parse($"{DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}");
+            MessageBox.Show(baslangicsure.ToString());
+            MessageBox.Show(databaseControl.WriteData("1", 123, 123, sure.ToString(), baslangicsure.ToString(), (baslangicsure + sure).ToString(), "ege", "pres1"));
         }
     }
 }

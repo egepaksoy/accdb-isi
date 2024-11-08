@@ -8,19 +8,20 @@ namespace Addresses
 {
     internal enum HoldRegAddresses
     {
-        sicaklik1 = 0,
-        sicaklik2 = 1,
+        // sicaklik cihazi degerleri
+        setSicaklik1 = 0,
+        setSicaklik2 = 1,
         
-        t1Value = 0,
-        t1AValue = 1,
+        // zamanlayici cihazi degerleri
+        timerSet = 0,
         timerFormat = 2,
     }
     internal enum InputRegAddresses
     {
-        timer1Value = 0,
-        timer2Value = 1,
-
+        // sicaklik cihazi degerleri
         olculenSicaklik = 0,
-        setSicaklik = 4,
+
+        // zamanlayici cihazi degerleri
+        timerValue = 0,
     }
 }
