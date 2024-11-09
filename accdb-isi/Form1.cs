@@ -261,32 +261,23 @@ namespace accdb_isi
             {
                 try
                 {
-                    //! rbf
-                    //string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
-                    //string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
+                    string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
+                    string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
 
-                    //string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
-                    //string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
+                    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
 
-                    //if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2) || string.IsNullOrEmpty(timerFormat) || string.IsNullOrEmpty(timerTime))
-                    //{
-                    //    ProcessController(false);
-                    //    MessageBox.Show("Modbus cihazlarından veri alma sorunu");
-                    //    return;
-                    //}
+                    if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2) || string.IsNullOrEmpty(timerFormat) || string.IsNullOrEmpty(timerTime))
+                    {
+                        ProcessController(false);
+                        MessageBox.Show("Modbus cihazlarından veri alma sorunu");
+                        return;
+                    }
 
-                    //TimerTime = ConvertTimer(timerTime, timerFormat);
+                    TimerTime = ConvertTimer(timerTime, timerFormat);
 
-                    //! rbf
-                    TimerTime = ConvertTimer("10", "2");
-
-                    //! rbf
-                    //GetSicaklik1 = Convert.ToInt32(getSicaklik1);
-                    //GetSicaklik2 = Convert.ToInt32(getSicaklik2);
-
-                    //! rbf
-                    GetSicaklik1 = Convert.ToInt32("400");
-                    GetSicaklik2 = Convert.ToInt32("300");
+                    GetSicaklik1 = Convert.ToInt32(getSicaklik1);
+                    GetSicaklik2 = Convert.ToInt32(getSicaklik2);
 
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
@@ -556,9 +547,7 @@ namespace accdb_isi
             string timerData = string.Empty;
             int timerInterval = 10000;
 
-            //! rbf
-            //if (dbConnected && modbusConnected)
-            if (dbConnected)
+            if (dbConnected && modbusConnected)
             {
                 SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1", setTableID).Split(':')[1].Trim());
                 SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
@@ -567,34 +556,32 @@ namespace accdb_isi
                 btnConnectDB.Enabled = false;
                 btnConnectModbus.Enabled = false;
 
-                //! rbf
-                //try
-                //{
-                //    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
-                //    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
+                try
+                {
+                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
+                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
 
-                //    //! setsurey'yi modbus formatında yaz
-                //    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat).Split(':')[0];
-                //    if (timerFormat == null)
-                //        return;
+                    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat).Split(':')[0];
+                    if (timerFormat == null)
+                        return;
 
-                //    int timerTime = ConvertToPLC(SetSure, timerFormat);
-                //    if (timerTime == -1)
-                //        return;
+                    int timerTime = ConvertToPLC(SetSure, timerFormat);
+                    if (timerTime == -1)
+                        return;
 
-                //    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, SetSure);
+                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, SetSure);
 
-                //    if (timerErr != null || temp1Err != null || temp2Err != null)
-                //    {
-                //        MessageBox.Show("Modbus cihazına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
-                //        return;
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    MessageBox.Show("Modbus cihazına veri yazma hatası: " + ex.Message);
-                //    return;
-                //}
+                    if (timerErr != null || temp1Err != null || temp2Err != null)
+                    {
+                        MessageBox.Show("Modbus cihazına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Modbus cihazına veri yazma hatası: " + ex.Message);
+                    return;
+                }
 
                 try
                 {
@@ -623,7 +610,7 @@ namespace accdb_isi
 
         private void StopModbus()
         {
-            //! modbusları durdur
+            // modbusları durdur
         }
 
         private void EndProcess()
@@ -650,13 +637,12 @@ namespace accdb_isi
             if (connect)
             {
                 ConnectDB(true);
-                //! rbf
-                //ConnectModbus(true);
-                //if (!(dbConnected && modbusConnected))
-                //{
-                //    MessageBox.Show("Veritabanına veya PLC bağlantısı sağlanılamadı");
-                //    return;
-                //}
+                ConnectModbus(true);
+                if (!(dbConnected && modbusConnected))
+                {
+                    MessageBox.Show("Veritabanına veya PLC bağlantısı sağlanılamadı");
+                    return;
+                }
 
                 btnStart.Text = "Durdur";
                 btnStart.BackColor = Color.Red;
@@ -690,11 +676,6 @@ namespace accdb_isi
         {
             ProcessController(false);
             MessageBox.Show("İşlem tamamlandı");
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ProcessController(true);
         }
     }
 }

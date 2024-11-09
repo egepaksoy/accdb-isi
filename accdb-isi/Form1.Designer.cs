@@ -62,7 +62,6 @@
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
             this.writerController = new System.Windows.Forms.Timer(this.components);
-            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
@@ -238,7 +237,6 @@
             // 
             // tabIslemler
             // 
-            this.tabIslemler.Controls.Add(this.button1);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
             this.tabIslemler.Controls.Add(this.makineLabel);
             this.tabIslemler.Controls.Add(this.btnStart);
@@ -396,16 +394,6 @@
             // 
             this.writerController.Tick += new System.EventHandler(this.writerController_Tick);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(341, 379);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -458,7 +446,6 @@
         private System.Windows.Forms.Timer writerController;
         private System.Windows.Forms.TextBox textBoxSetTableID;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button button1;
     }
 }
 
