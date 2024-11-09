@@ -278,7 +278,7 @@ namespace accdb_isi
                     //TimerTime = ConvertTimer(timerTime, timerFormat);
 
                     //! rbf
-                    TimerTime = ConvertTimer("50", "2");
+                    TimerTime = ConvertTimer("10", "2");
 
                     //! rbf
                     //GetSicaklik1 = Convert.ToInt32(getSicaklik1);
@@ -291,9 +291,9 @@ namespace accdb_isi
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
                     int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
-                    string GetSure = TimerTime;// timer zamani
+                    string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
-                    string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
+                    string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure/3600)}:{Convert.ToInt32(SetSure/60)}:{Convert.ToInt32(SetSure%60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
 
                     string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
                     if (!string.IsNullOrEmpty(errMessage))
@@ -688,8 +688,8 @@ namespace accdb_isi
 
         private void writerController_Tick(object sender, EventArgs e)
         {
-            MessageBox.Show("İşlem tamamlandı");
             ProcessController(false);
+            MessageBox.Show("İşlem tamamlandı");
         }
 
         private void button1_Click(object sender, EventArgs e)
