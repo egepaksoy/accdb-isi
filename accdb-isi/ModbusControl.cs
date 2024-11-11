@@ -236,7 +236,7 @@ namespace ModbusController
 
             try
             {
-                modbusMaster.WriteMultipleRegisters(slaveId, regAddress, new ushort[] { writeValue });
+                modbusMaster.WriteSingleRegister(slaveId, regAddress, writeValue);
             }
             catch (TimeoutException e)
             {
@@ -261,7 +261,7 @@ namespace ModbusController
 
             try
             {
-                modbusMaster.WriteMultipleCoils(slaveId, coilAddress, new bool[] { writeValue });
+                modbusMaster.WriteSingleCoil(slaveId, coilAddress, writeValue);
             }
             catch (TimeoutException e)
             {
