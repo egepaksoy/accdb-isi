@@ -393,22 +393,31 @@ namespace accdb_isi
                     comboBoxModbusConn.Items.Clear();
                     comboBoxModbusConn.Items.AddRange(portNames);
                 }
+            }
 
-                if (textBoxDBPath.Text != databasePath)
-                    textBoxDBPath.Text = databasePath;
+            if (textBoxDBPath.Text != databasePath)
+                textBoxDBPath.Text = databasePath;
 
+            if (tempreture1ID == -1)
+            {
                 if (!string.IsNullOrEmpty(textBoxTemp1ID.Text))
                 {
                     if (Convert.ToInt32(textBoxTemp1ID.Text) != tempreture1ID)
                         tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
                 }
-
+            }
+            
+            if (tempreture2ID == -1)
+            {
                 if (!string.IsNullOrEmpty(textBoxTemp2ID.Text))
                 {
                     if (Convert.ToInt32(textBoxTemp2ID.Text) != tempreture2ID)
                         tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
                 }
-
+            }
+            
+            if (timerID == -1)
+            {
                 if (!string.IsNullOrEmpty(textBoxTimerID.Text))
                 {
                     if (Convert.ToInt32(textBoxTimerID.Text) != timerID)
@@ -441,6 +450,7 @@ namespace accdb_isi
                     GetSicaklik1 = Convert.ToInt32(getSicaklik1);
                     GetSicaklik2 = Convert.ToInt32(getSicaklik2);
 
+                    MessageBox.Show(timerTime);
                     TimerTime = PlcToTime(timerTime, timerFormat);
 
                 }
@@ -550,12 +560,12 @@ namespace accdb_isi
                     TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat).Split(':')[0];
                     if (TimerFormat == null)
                         return;
-
+                    
                     int timerTime = TimeToPlc(SetSure, TimerFormat);
                     if (timerTime == -1)
                         return;
 
-                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, SetSure);
+                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, timerTime);
 
                     if (timerErr != null || temp1Err != null || temp2Err != null)
                     {

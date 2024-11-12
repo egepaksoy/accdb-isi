@@ -213,6 +213,7 @@ namespace ModbusController
             }
             catch
             {
+                MessageBox.Show($"Plc'den veri okuma hatası. Plc ID: {SlaveId}");
                 return returnData;
             }
             finally
