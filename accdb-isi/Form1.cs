@@ -70,14 +70,7 @@ namespace accdb_isi
 
         private void btnConnectModbus_Click(object sender, EventArgs e)
         {
-            if (btnConnectModbus.Text == "Modbus Cihazına Bağlan")
-            {
-                ConnectModbus(true);
-            }
-            else
-            {
-                ConnectModbus(false);
-            }
+            ConnectModbus(btnConnectModbus.Text == "Modbus Cihazına Bağlan");
         }
 
         private void ConnectModbus(bool connect)
@@ -125,6 +118,7 @@ namespace accdb_isi
         {
             if (connect)
             {
+                generalTimer.Enabled = false;
                 if (databasePath == string.Empty)
                 {
                     MessageBox.Show("Ayarlardan veritabanı seçin");
@@ -274,7 +268,7 @@ namespace accdb_isi
                         return;
                     }
 
-                    TimerTime = ConvertTimer(timerTime, timerFormat);
+                    TimerTime = PlcToTime(timerTime, timerFormat);
 
                     GetSicaklik1 = Convert.ToInt32(getSicaklik1);
                     GetSicaklik2 = Convert.ToInt32(getSicaklik2);
@@ -304,62 +298,55 @@ namespace accdb_isi
             }
         }
 
-        private string ConvertTimer(string TimerTime, string timerFormat)
+        private string PlcToTime(string TimerTime, string timerFormat)
         {
             double hour = 0;
             double minute = 0;
             double second = 0;
-            string timerTime = "";
 
-            // plc zamanını 4 haneli yapma
-            if (timerTime.Length != 4)
-            {
-                for (int i = 0; i < timerTime.Length - 4; i++)
-                    timerTime += "0";
-                timerTime += TimerTime;
-            }
+            int timerTime = Convert.ToInt32(TimerTime);
 
-            // plc zaman formatını normal saat:dakika:saniye formatına dondurme
-            if (timerFormat == "0")
-                second = Convert.ToInt32(timerTime) / 100.0;
-            else if (timerFormat == "1")
-                second = Convert.ToInt32(timerTime) / 10.0;
-            else if (timerFormat == "2")
-                second = Convert.ToDouble(timerTime);
-            else if (timerFormat == "3")
+            switch (timerFormat)
             {
-                minute = Convert.ToInt32(Convert.ToInt32(timerTime) / 100.0);
-                second = Convert.ToInt32(timerTime) % 100;
-            }
-            else if (timerFormat == "4")
-                minute = Convert.ToInt32(timerTime) / 10.0;
-            else if (timerFormat == "5")
-                minute = Convert.ToDouble(timerTime);
-            else if (timerFormat == "6")
-            {
-                hour = Convert.ToInt32(Convert.ToInt32(timerTime) / 100.0);
-                minute = Convert.ToInt32(timerTime) % 100;
-            }
-            else if (timerFormat == "7")
-                hour = Convert.ToInt32(timerTime) / 10.0;
-            else if (timerFormat == "8")
-                hour = Convert.ToDouble(timerTime);
-
-            // 60 dakika formatında dondurme
-            if (second >= 60)
-            {
-                minute += Convert.ToInt32(second / 60);
-                second %= 60;
-            }
-            if (minute >= 60)
-            {
-                hour += Convert.ToInt32(minute / 60);
-                minute %= 60;
+                case "0":
+                    second = timerTime / 100;
+                    break;
+                case "1":
+                    second = timerTime / 10;
+                    break;
+                case "2":
+                    second = timerTime;
+                    break;
+                case "3":
+                    second = timerTime % 100;
+                    minute = Convert.ToInt32(timerTime / 100);
+                    break;
+                case "4":
+                    minute = timerTime / 10;
+                    break;
+                case "5":
+                    minute = timerTime;
+                    break;
+                case "6":
+                    minute = timerTime % 100;
+                    hour = Convert.ToInt32(timerTime / 100);
+                    break;
+                case "7":
+                    hour = timerTime / 10;
+                    break;
+                case "8":
+                    hour = timerTime;
+                    break;
+                default:
+                    MessageBox.Show($"Plc formatı {timerFormat} bulunamadı");
+                    return null;
             }
 
-            hour = Convert.ToInt32(hour);
-            minute = Convert.ToInt32(minute);
-            second = Convert.ToInt32(second);
+            if (minute >= 60 || second >= 60 || hour >= 24)
+            {
+                MessageBox.Show($"Timer zamanında sıkıntı çıktı: {hour}:{minute}:{second}");
+                return null;
+            }
 
             return $"{hour}:{minute}:{second}";
         }
@@ -433,7 +420,16 @@ namespace accdb_isi
                     string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
                     string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
 
-                    if (string.IsNullOrEmpty(getSicaklik1) && string.IsNullOrEmpty(getSicaklik2))
+                    if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
+                    {
+                        ProcessController(false);
+                        return;
+                    }
+
+                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
+                    string timerFormat = modbusControl.ReadInputRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+
+                    if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(timerFormat))
                     {
                         ProcessController(false);
                         return;
@@ -441,6 +437,9 @@ namespace accdb_isi
 
                     GetSicaklik1 = Convert.ToInt32(getSicaklik1);
                     GetSicaklik2 = Convert.ToInt32(getSicaklik2);
+
+                    TimerTime = PlcToTime(timerTime, timerFormat);
+
                 }
                 catch (Exception ex)
                 {
@@ -469,76 +468,60 @@ namespace accdb_isi
             {
                 aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
                 aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
+
+                labelTimerValue.Text = TimerTime;
             }
             else
             {
                 aktifSicaklik1.Text = "Aktif Sıcaklık: ";
                 aktifSicaklik2.Text = "Aktif Sıcaklık: ";
+             
+                labelTimerValue.Text = "00:00:00";
             }
         }
 
-        public int ConvertToPLC(int setSure, string format)
+        public int TimeToPlc(int setSure, string format)
         {
-            if (format == "0")
+            switch (format)
             {
-                if (setSure >= 100)
-                {
-                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
-                    return -1;
-                }
-                else if (setSure < 100)
-                    return setSure * 100;
+                case "0":
+                    if (setSure < 100)
+                        return setSure / 100;
+                    break;
+                case "1":
+                    if (setSure < 1000)
+                        return setSure / 10;
+                    break;
+                case "2":
+                    if (setSure < 10000)
+                        return setSure;
+                    break;
+                case "3":
+                    if (setSure < 600)
+                        return Convert.ToInt32(setSure / 60) * 100 + setSure % 60;
+                    break;
+                case "4":
+                    if (setSure < 60000)
+                        return (setSure / 60) / 10;
+                    break;
+                case "5":
+                    if (setSure < 600000)
+                        return Convert.ToInt32(setSure / 60);
+                    break;
+                case "6":
+                    if (setSure < 360000)
+                        return Convert.ToInt32(setSure / 3600) * 100 + setSure % 3600;
+                    break;
+                case "7":
+                    if (setSure < 3600000)
+                        return Convert.ToInt32(setSure / 3600) / 10;
+                    break;
+                case "8":
+                    if (setSure < 36000000)
+                        return Convert.ToInt32(setSure / 3600);
+                    break;
             }
-            if (format == "1")
-            {
-                if (setSure >= 1000)
-                {
-                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
-                    return -1;
-                }
-                else if (setSure < 1000)
-                    return setSure * 10;
-            }
-            if (format == "2")
-            {
-                if (setSure >= 10000)
-                {
-                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
-                    return -1;
-                }
-                else if (setSure < 10000)
-                    return setSure;
-            }
-            if (format == "3")
-            {
-                if (setSure >= 6000)
-                {
-                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
-                    return -1;
-                }
-                else if (setSure < 6000)
-                    return Convert.ToInt32(setSure / 60) * 100 + setSure % 60;
-            }
-            if (format == "4")
-            {
-                if (setSure >= 60000)
-                {
-                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
-                    return -1;
-                }
-                else if (SetSure < 60000)
-                    return Convert.ToInt32(setSure / 60) * 10 + Convert.ToInt32((setSure / 60 - Convert.ToInt32(setSure / 60)) * 10);
-            }
-            if (format == "5")
-            {
-                if (setSure >= 600000)
-                {
-                    MessageBox.Show("PLC sure formatı ile veritabanı formatı uyuşmazlığı.\nVeritabanındaki SetSure bilgisinin PLC'deki formata yazılabildiğinden emin olun!");
-                    return -1;
-                }
-                else if (setSure < 600000)
-                    return Convert.ToInt32(setSure / 60);
-            }
+            MessageBox.Show($"Veritabanındaki süre formatı plc'deki ile uyumsuz\nPlc Formatı: {format} Veritabanı süre: {setSure}\nPlc formatını değiştirin.");
             return -1;
         }
 
@@ -565,7 +548,7 @@ namespace accdb_isi
                     if (timerFormat == null)
                         return;
 
-                    int timerTime = ConvertToPLC(SetSure, timerFormat);
+                    int timerTime = TimeToPlc(SetSure, timerFormat);
                     if (timerTime == -1)
                         return;
 

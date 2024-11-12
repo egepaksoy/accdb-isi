@@ -47,6 +47,8 @@
             this.btnStart = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabIslemler = new System.Windows.Forms.TabPage();
+            this.labelTimerValue = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.tabAyarlar = new System.Windows.Forms.TabPage();
             this.textBoxSetTableID = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -71,7 +73,7 @@
             // 
             this.hedefSicaklik1.AutoSize = true;
             this.hedefSicaklik1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.hedefSicaklik1.Location = new System.Drawing.Point(197, 138);
+            this.hedefSicaklik1.Location = new System.Drawing.Point(308, 138);
             this.hedefSicaklik1.Name = "hedefSicaklik1";
             this.hedefSicaklik1.Size = new System.Drawing.Size(106, 18);
             this.hedefSicaklik1.TabIndex = 0;
@@ -81,7 +83,7 @@
             // 
             this.aktifSicaklik1.AutoSize = true;
             this.aktifSicaklik1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.aktifSicaklik1.Location = new System.Drawing.Point(197, 162);
+            this.aktifSicaklik1.Location = new System.Drawing.Point(308, 162);
             this.aktifSicaklik1.Name = "aktifSicaklik1";
             this.aktifSicaklik1.Size = new System.Drawing.Size(91, 18);
             this.aktifSicaklik1.TabIndex = 1;
@@ -91,7 +93,7 @@
             // 
             this.hedefSicaklik2.AutoSize = true;
             this.hedefSicaklik2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.hedefSicaklik2.Location = new System.Drawing.Point(470, 138);
+            this.hedefSicaklik2.Location = new System.Drawing.Point(581, 138);
             this.hedefSicaklik2.Name = "hedefSicaklik2";
             this.hedefSicaklik2.Size = new System.Drawing.Size(106, 18);
             this.hedefSicaklik2.TabIndex = 2;
@@ -101,7 +103,7 @@
             // 
             this.aktifSicaklik2.AutoSize = true;
             this.aktifSicaklik2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.aktifSicaklik2.Location = new System.Drawing.Point(470, 162);
+            this.aktifSicaklik2.Location = new System.Drawing.Point(581, 162);
             this.aktifSicaklik2.Name = "aktifSicaklik2";
             this.aktifSicaklik2.Size = new System.Drawing.Size(95, 18);
             this.aktifSicaklik2.TabIndex = 3;
@@ -121,7 +123,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label1.Location = new System.Drawing.Point(197, 95);
+            this.label1.Location = new System.Drawing.Point(308, 95);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(146, 16);
             this.label1.TabIndex = 5;
@@ -131,7 +133,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label2.Location = new System.Drawing.Point(470, 95);
+            this.label2.Location = new System.Drawing.Point(581, 95);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(146, 16);
             this.label2.TabIndex = 6;
@@ -209,7 +211,7 @@
             // generalTimer
             // 
             this.generalTimer.Enabled = true;
-            this.generalTimer.Interval = 800;
+            this.generalTimer.Interval = 1500;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
             // btnStart
@@ -237,6 +239,8 @@
             // 
             // tabIslemler
             // 
+            this.tabIslemler.Controls.Add(this.labelTimerValue);
+            this.tabIslemler.Controls.Add(this.label7);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
             this.tabIslemler.Controls.Add(this.makineLabel);
             this.tabIslemler.Controls.Add(this.btnStart);
@@ -258,6 +262,26 @@
             this.tabIslemler.TabIndex = 0;
             this.tabIslemler.Text = "İşlemler";
             this.tabIslemler.UseVisualStyleBackColor = true;
+            // 
+            // labelTimerValue
+            // 
+            this.labelTimerValue.AutoSize = true;
+            this.labelTimerValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.labelTimerValue.Location = new System.Drawing.Point(39, 138);
+            this.labelTimerValue.Name = "labelTimerValue";
+            this.labelTimerValue.Size = new System.Drawing.Size(120, 31);
+            this.labelTimerValue.TabIndex = 17;
+            this.labelTimerValue.Text = "00:00:00";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label7.Location = new System.Drawing.Point(52, 95);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(90, 16);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Timer Zamanı";
             // 
             // tabAyarlar
             // 
@@ -446,6 +470,8 @@
         private System.Windows.Forms.Timer writerController;
         private System.Windows.Forms.TextBox textBoxSetTableID;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label labelTimerValue;
+        private System.Windows.Forms.Label label7;
     }
 }
 
