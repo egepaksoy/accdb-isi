@@ -263,7 +263,7 @@ namespace accdb_isi
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
                     int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
-                    MessageBox.Show(TimerTime);
+                    
                     string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
                     string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure/3600)}:{Convert.ToInt32(SetSure/60)}:{Convert.ToInt32(SetSure%60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
@@ -483,9 +483,8 @@ namespace accdb_isi
                 aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
                 aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
 
-                MessageBox.Show(TimerTime);
-                if (PlcToTime(TimerTime, TimerFormat) != null)
-                    labelTimerValue.Text = PlcToTime(TimerTime, TimerFormat);
+                if (!string.IsNullOrEmpty(TimerTime))
+                    labelTimerValue.Text = TimerTime;
                 else
                     labelTimerValue.Text = "00:00:00";
             }
