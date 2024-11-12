@@ -258,23 +258,8 @@ namespace accdb_isi
             {
                 try
                 {
-                    string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
-                    string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
-
-                    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
-                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
-
-                    if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2) || string.IsNullOrEmpty(timerFormat) || string.IsNullOrEmpty(timerTime))
-                    {
-                        ProcessController(false);
-                        MessageBox.Show("Modbus cihazlarından veri alma sorunu");
+                    if (GetModbusValues() == false)
                         return;
-                    }
-
-                    TimerTime = PlcToTime(timerTime, timerFormat);
-
-                    GetSicaklik1 = Convert.ToInt32(getSicaklik1);
-                    GetSicaklik2 = Convert.ToInt32(getSicaklik2);
 
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
@@ -381,6 +366,43 @@ namespace accdb_isi
             }
         }
 
+        private bool GetModbusValues()
+        {
+            try
+            {
+                string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
+                string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
+
+                if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
+                {
+                    ProcessController(false);
+                    return false;
+                }
+
+                string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
+                TimerFormat = modbusControl.ReadInputRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+
+                if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(TimerFormat))
+                {
+                    ProcessController(false);
+                    return false;
+                }
+
+                GetSicaklik1 = Convert.ToInt32(getSicaklik1);
+                GetSicaklik2 = Convert.ToInt32(getSicaklik2);
+
+                TimerTime = PlcToTime(timerTime, TimerFormat);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ProcessController(false);
+                MessageBox.Show("Modbus cihazlarından veri alma sorunu: " + ex.Message);
+                return false;
+            }
+        }
+
         private void generalTimer_Tick(object sender, EventArgs e)
         {
             if (tabControl1.SelectedTab.Name == "tabAyarlar")
@@ -427,38 +449,7 @@ namespace accdb_isi
 
             if (modbusConnected)
             {
-                try
-                {
-                    string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
-                    string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
-
-                    if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
-                    {
-                        ProcessController(false);
-                        return;
-                    }
-
-                    string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
-                    string timerFormat = modbusControl.ReadInputRegsData(timerID, (int)HoldRegAddresses.timerFormat);
-
-                    if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(timerFormat))
-                    {
-                        ProcessController(false);
-                        return;
-                    }
-
-                    GetSicaklik1 = Convert.ToInt32(getSicaklik1);
-                    GetSicaklik2 = Convert.ToInt32(getSicaklik2);
-
-                    MessageBox.Show(timerTime);
-                    TimerTime = PlcToTime(timerTime, timerFormat);
-
-                }
-                catch (Exception ex)
-                {
-                    ProcessController(false);
-                    MessageBox.Show("Modbus cihazlarından veri alma sorunu: " + ex.Message);
-                }
+                GetModbusValues();
 
                 UpdateLabels(true);
             }
@@ -479,10 +470,16 @@ namespace accdb_isi
         {
             if (active)
             {
+                if (GetModbusValues() == false)
+                    return;
+
                 aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
                 aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
 
-                labelTimerValue.Text = PlcToTime(TimerTime, TimerFormat);
+                if (PlcToTime(TimerTime, TimerFormat) != null)
+                    labelTimerValue.Text = PlcToTime(TimerTime, TimerFormat);
+                else
+                    labelTimerValue.Text = "00:00:00";
             }
             else
             {
