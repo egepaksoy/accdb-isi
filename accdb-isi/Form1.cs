@@ -263,6 +263,7 @@ namespace accdb_isi
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
                     int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
                     int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
+                    MessageBox.Show(TimerTime);
                     string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
                     string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure/3600)}:{Convert.ToInt32(SetSure/60)}:{Convert.ToInt32(SetSure%60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
@@ -271,7 +272,7 @@ namespace accdb_isi
                     if (!string.IsNullOrEmpty(errMessage))
                     {
                         ProcessController(false);
-                        MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + errMessage);
+                        MessageBox.Show("Veritabanına yazmada hata çıktı: " + errMessage);
                         return;
                     }
                 }
@@ -292,6 +293,13 @@ namespace accdb_isi
             double second = 0;
 
             int timerTime = Convert.ToInt32(TimerTime);
+
+            if (string.IsNullOrEmpty(TimerTime))
+            {
+                ProcessController(false);
+                MessageBox.Show("Zaman degeri cekilemedi");
+                return null;
+            }    
 
             switch (timerFormat)
             {
@@ -475,6 +483,7 @@ namespace accdb_isi
                 aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
                 aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
 
+                MessageBox.Show(TimerTime);
                 if (PlcToTime(TimerTime, TimerFormat) != null)
                     labelTimerValue.Text = PlcToTime(TimerTime, TimerFormat);
                 else
@@ -602,7 +611,7 @@ namespace accdb_isi
 
         private void StopModbus()
         {
-            // modbusları durdur
+            ConnectModbus(false);
         }
 
         private void EndProcess()
