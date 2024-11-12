@@ -425,7 +425,7 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.tabControl1);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Press Kontrol Programı";
             this.tabControl1.ResumeLayout(false);
             this.tabIslemler.ResumeLayout(false);
             this.tabIslemler.PerformLayout();
