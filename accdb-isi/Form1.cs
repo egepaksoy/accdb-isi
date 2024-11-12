@@ -33,12 +33,15 @@ namespace accdb_isi
 
         string operatorName = string.Empty;
         string makineName = string.Empty;
+
         string TimerTime = string.Empty;
+        string TimerFormat = string.Empty;
+        int SetSure = 0;
+
         int SetSicaklik1 = 0;
         int SetSicaklik2 = 0;
         int GetSicaklik1 = 0;
         int GetSicaklik2 = 0;
-        int SetSure = 0;
 
         int setTableID = -1;
         
@@ -469,7 +472,7 @@ namespace accdb_isi
                 aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
                 aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
 
-                labelTimerValue.Text = TimerTime;
+                labelTimerValue.Text = PlcToTime(TimerTime, TimerFormat);
             }
             else
             {
@@ -544,11 +547,11 @@ namespace accdb_isi
                     string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
                     string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
 
-                    string timerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat).Split(':')[0];
-                    if (timerFormat == null)
+                    TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat).Split(':')[0];
+                    if (TimerFormat == null)
                         return;
 
-                    int timerTime = TimeToPlc(SetSure, timerFormat);
+                    int timerTime = TimeToPlc(SetSure, TimerFormat);
                     if (timerTime == -1)
                         return;
 
