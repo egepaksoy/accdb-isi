@@ -16,8 +16,6 @@ namespace ModbusController
         public SerialPort serialPort;
         private IModbusSerialMaster modbusMaster;
 
-        private ushort startAddress;
-
         private int readTimeout;
         private int writeTimeout;
 
