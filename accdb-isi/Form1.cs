@@ -398,7 +398,7 @@ namespace accdb_isi
                 }
 
                 string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
-                TimerFormat = modbusControl.ReadInputRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+                TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
 
                 if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(TimerFormat))
                 {
@@ -406,8 +406,8 @@ namespace accdb_isi
                     return false;
                 }
 
-                GetSicaklik1 = Convert.ToInt32(getSicaklik1);
-                GetSicaklik2 = Convert.ToInt32(getSicaklik2);
+                GetSicaklik1 = Convert.ToInt32(getSicaklik1) / 1000;
+                GetSicaklik2 = Convert.ToInt32(getSicaklik2) / 1000;
 
                 TimerTime = PlcToTime(timerTime, TimerFormat);
 
@@ -433,36 +433,16 @@ namespace accdb_isi
                     comboBoxModbusConn.Items.Clear();
                     comboBoxModbusConn.Items.AddRange(portNames);
                 }
-            }
+                
+                if (textBoxDBPath.Text != databasePath)
+                    textBoxDBPath.Text = databasePath;
 
-            if (textBoxDBPath.Text != databasePath)
-                textBoxDBPath.Text = databasePath;
-
-            if (tempreture1ID == -1)
-            {
-                if (!string.IsNullOrEmpty(textBoxTemp1ID.Text))
-                {
-                    if (Convert.ToInt32(textBoxTemp1ID.Text) != tempreture1ID)
-                        tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
-                }
-            }
-            
-            if (tempreture2ID == -1)
-            {
-                if (!string.IsNullOrEmpty(textBoxTemp2ID.Text))
-                {
-                    if (Convert.ToInt32(textBoxTemp2ID.Text) != tempreture2ID)
-                        tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
-                }
-            }
-            
-            if (timerID == -1)
-            {
-                if (!string.IsNullOrEmpty(textBoxTimerID.Text))
-                {
-                    if (Convert.ToInt32(textBoxTimerID.Text) != timerID)
-                        timerID = Convert.ToInt32(textBoxTimerID.Text);
-                }
+                if (!string.IsNullOrEmpty(textBoxTimerID.Text) && Convert.ToInt32(textBoxTimerID.Text) != timerID)
+                    timerID = Convert.ToInt32(textBoxTimerID.Text);
+                if (!string.IsNullOrEmpty(textBoxTemp1ID.Text) && Convert.ToInt32(textBoxTemp1ID.Text) != timerID)
+                    tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
+                if (!string.IsNullOrEmpty(textBoxTemp2ID.Text) && Convert.ToInt32(textBoxTemp2ID.Text) != timerID)
+                    tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
             }
 
             if (modbusConnected)
@@ -498,8 +478,6 @@ namespace accdb_isi
                     labelTimerValue.Text = TimerTime;
                 else
                     labelTimerValue.Text = "00:00:00";
-
-                label6.Text = $"olculen : {modbusControl.ReadInputRegsData(tempreture2ID, 0)}\nanalog yuzde: {modbusControl.ReadInputRegsData(tempreture2ID, 1)}";
             }
             else
             {
@@ -692,25 +670,13 @@ namespace accdb_isi
             MessageBox.Show("İşlem tamamlandı");
         }
 
-        private void comboBoxSelect(object sender, MouseEventArgs e)
-        {
-            generalTimer.Enabled = false;
-        }
-
-        private void comboBoxSelect(object sender, EventArgs e)
-        {
-            generalTimer.Enabled = false;
-        }
-
-        private void textBoxPressed(object sender, EventArgs e)
-        {
-            generalTimer.Enabled = true;
-        }
-
         private void tabControl1_TabIndexChanged(object sender, EventArgs e)
         {
             if (tabControl1.SelectedTab.Name == "tabAyarlar")
+            {
                 generalTimer.Interval = 800;
+                generalTimer.Enabled = true;
+            }
             else if (tabControl1.SelectedTab.Name == "tabIslemler")
             {
                 generalTimer.Interval = 3000;

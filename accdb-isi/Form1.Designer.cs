@@ -46,6 +46,7 @@
             this.btnStart = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabIslemler = new System.Windows.Forms.TabPage();
+            this.groupBox = new System.Windows.Forms.GroupBox();
             this.labelTimerValue = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.tabAyarlar = new System.Windows.Forms.TabPage();
@@ -63,12 +64,10 @@
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
             this.writerController = new System.Windows.Forms.Timer(this.components);
-            this.groupBox = new System.Windows.Forms.GroupBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
-            this.tabAyarlar.SuspendLayout();
             this.groupBox.SuspendLayout();
+            this.tabAyarlar.SuspendLayout();
             this.SuspendLayout();
             // 
             // hedefSicaklik1
@@ -143,7 +142,6 @@
             // 
             // writeDBTimer
             // 
-            this.writeDBTimer.Enabled = true;
             this.writeDBTimer.Tick += new System.EventHandler(this.writeDBTimer_Tick);
             // 
             // btnConnectDB
@@ -230,7 +228,6 @@
             // 
             // tabIslemler
             // 
-            this.tabIslemler.Controls.Add(this.label6);
             this.tabIslemler.Controls.Add(this.groupBox);
             this.tabIslemler.Controls.Add(this.labelTimerValue);
             this.tabIslemler.Controls.Add(this.label7);
@@ -251,6 +248,16 @@
             this.tabIslemler.TabIndex = 0;
             this.tabIslemler.Text = "İşlemler";
             this.tabIslemler.UseVisualStyleBackColor = true;
+            // 
+            // groupBox
+            // 
+            this.groupBox.Controls.Add(this.btnConnectModbus);
+            this.groupBox.Controls.Add(this.btnConnectDB);
+            this.groupBox.Location = new System.Drawing.Point(27, 353);
+            this.groupBox.Name = "groupBox";
+            this.groupBox.Size = new System.Drawing.Size(183, 46);
+            this.groupBox.TabIndex = 18;
+            this.groupBox.TabStop = false;
             // 
             // labelTimerValue
             // 
@@ -317,7 +324,6 @@
             this.textBoxTemp2ID.Name = "textBoxTemp2ID";
             this.textBoxTemp2ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp2ID.TabIndex = 10;
-            this.textBoxTemp2ID.TextChanged += new System.EventHandler(this.textBoxPressed);
             // 
             // label4
             // 
@@ -334,7 +340,6 @@
             this.textBoxTemp1ID.Name = "textBoxTemp1ID";
             this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp1ID.TabIndex = 8;
-            this.textBoxTemp1ID.TextChanged += new System.EventHandler(this.textBoxPressed);
             // 
             // textBoxTimerID
             // 
@@ -342,7 +347,6 @@
             this.textBoxTimerID.Name = "textBoxTimerID";
             this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTimerID.TabIndex = 7;
-            this.textBoxTimerID.TextChanged += new System.EventHandler(this.textBoxPressed);
             // 
             // labelTempertureID
             // 
@@ -370,10 +374,6 @@
             this.comboBoxModbusConn.Size = new System.Drawing.Size(100, 21);
             this.comboBoxModbusConn.TabIndex = 4;
             this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
-            this.comboBoxModbusConn.Click += new System.EventHandler(this.comboBoxSelect);
-            this.comboBoxModbusConn.MouseClick += new System.Windows.Forms.MouseEventHandler(this.comboBoxSelect);
-            this.comboBoxModbusConn.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.comboBoxSelect);
-            this.comboBoxModbusConn.MouseCaptureChanged += new System.EventHandler(this.comboBoxSelect);
             // 
             // label3
             // 
@@ -414,25 +414,6 @@
             // 
             this.writerController.Tick += new System.EventHandler(this.writerController_Tick);
             // 
-            // groupBox
-            // 
-            this.groupBox.Controls.Add(this.btnConnectModbus);
-            this.groupBox.Controls.Add(this.btnConnectDB);
-            this.groupBox.Location = new System.Drawing.Point(27, 353);
-            this.groupBox.Name = "groupBox";
-            this.groupBox.Size = new System.Drawing.Size(183, 46);
-            this.groupBox.TabIndex = 18;
-            this.groupBox.TabStop = false;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(282, 271);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(35, 13);
-            this.label6.TabIndex = 19;
-            this.label6.Text = "label6";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -446,9 +427,9 @@
             this.tabControl1.ResumeLayout(false);
             this.tabIslemler.ResumeLayout(false);
             this.tabIslemler.PerformLayout();
+            this.groupBox.ResumeLayout(false);
             this.tabAyarlar.ResumeLayout(false);
             this.tabAyarlar.PerformLayout();
-            this.groupBox.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -489,7 +470,6 @@
         private System.Windows.Forms.Label labelTimerValue;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.GroupBox groupBox;
-        private System.Windows.Forms.Label label6;
     }
 }
 

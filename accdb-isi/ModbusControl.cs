@@ -148,7 +148,6 @@ namespace ModbusController
             byte slaveId = Convert.ToByte(SlaveId);
             ushort inputAddress = Convert.ToUInt16(InputAddress);
             
-            bool veriCekildi = false;
             List<string> gelenVeri = new List<string>();
             ushort[] inputRegisters;
             
@@ -167,19 +166,13 @@ namespace ModbusController
                 inputRegisters = modbusMaster.ReadInputRegisters(slaveId, inputAddress, numRegisters);
                 foreach (ushort inputRegister in inputRegisters)
                     gelenVeri.Add(inputRegister.ToString());
-
-                veriCekildi = true;
             }
             catch
             {
                 return returnData;
             }
-            finally
-            {
-                if (veriCekildi)
-                    returnData = string.Join(":", gelenVeri);
-            }
-            return returnData;
+            
+            return string.Join(":", gelenVeri);
         }
 
         public string ReadHoldRegsData(int SlaveId, int RegAddress, ushort numRegisters = 1)
@@ -187,7 +180,6 @@ namespace ModbusController
             byte slaveId = Convert.ToByte(SlaveId);
             ushort regAddress = Convert.ToUInt16(RegAddress);
             
-            bool veriCekildi = false;
             List<string> gelenVeri = new List<string>();
             ushort[] holdingRegisters;
             
@@ -206,20 +198,14 @@ namespace ModbusController
                 holdingRegisters = modbusMaster.ReadHoldingRegisters(slaveId, regAddress, numRegisters);
                 foreach (ushort holdingRegister in holdingRegisters)
                     gelenVeri.Add(holdingRegister.ToString());
-
-                veriCekildi = true;
             }
             catch
             {
                 MessageBox.Show($"Plc'den veri okuma hatası. Plc ID: {SlaveId}");
                 return returnData;
             }
-            finally
-            {
-                if (veriCekildi)
-                    returnData = string.Join(":", gelenVeri);
-            }
-            return returnData;
+
+            return string.Join(":", gelenVeri);
         }
 
         public string WriteHoldRegData(int SlaveId, int RegAddress, int WriteValue)
