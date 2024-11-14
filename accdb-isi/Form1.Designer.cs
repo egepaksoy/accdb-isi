@@ -40,8 +40,6 @@
             this.writeDBTimer = new System.Windows.Forms.Timer(this.components);
             this.btnConnectDB = new System.Windows.Forms.Button();
             this.btnConnectModbus = new System.Windows.Forms.Button();
-            this.labelDBConnected = new System.Windows.Forms.Label();
-            this.labelModbusConnected = new System.Windows.Forms.Label();
             this.makineLabel = new System.Windows.Forms.Label();
             this.btnClearLogs = new System.Windows.Forms.Button();
             this.generalTimer = new System.Windows.Forms.Timer(this.components);
@@ -65,9 +63,12 @@
             this.btnDBSelect = new System.Windows.Forms.Button();
             this.labelDatabase = new System.Windows.Forms.Label();
             this.writerController = new System.Windows.Forms.Timer(this.components);
+            this.groupBox = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabIslemler.SuspendLayout();
             this.tabAyarlar.SuspendLayout();
+            this.groupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // hedefSicaklik1
@@ -147,43 +148,29 @@
             // 
             // btnConnectDB
             // 
-            this.btnConnectDB.Location = new System.Drawing.Point(26, 367);
+            this.btnConnectDB.BackColor = System.Drawing.Color.LimeGreen;
+            this.btnConnectDB.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConnectDB.ForeColor = System.Drawing.Color.White;
+            this.btnConnectDB.Location = new System.Drawing.Point(0, 0);
             this.btnConnectDB.Name = "btnConnectDB";
             this.btnConnectDB.Size = new System.Drawing.Size(94, 47);
             this.btnConnectDB.TabIndex = 7;
             this.btnConnectDB.Text = "Veritabanına Bağlan";
-            this.btnConnectDB.UseVisualStyleBackColor = true;
+            this.btnConnectDB.UseVisualStyleBackColor = false;
             this.btnConnectDB.Click += new System.EventHandler(this.btnConnectDB_Click);
             // 
             // btnConnectModbus
             // 
-            this.btnConnectModbus.Location = new System.Drawing.Point(182, 367);
+            this.btnConnectModbus.BackColor = System.Drawing.Color.LimeGreen;
+            this.btnConnectModbus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConnectModbus.ForeColor = System.Drawing.Color.White;
+            this.btnConnectModbus.Location = new System.Drawing.Point(89, 0);
             this.btnConnectModbus.Name = "btnConnectModbus";
             this.btnConnectModbus.Size = new System.Drawing.Size(94, 47);
             this.btnConnectModbus.TabIndex = 8;
             this.btnConnectModbus.Text = "Modbus Cihazına Bağlan";
-            this.btnConnectModbus.UseVisualStyleBackColor = true;
+            this.btnConnectModbus.UseVisualStyleBackColor = false;
             this.btnConnectModbus.Click += new System.EventHandler(this.btnConnectModbus_Click);
-            // 
-            // labelDBConnected
-            // 
-            this.labelDBConnected.AutoSize = true;
-            this.labelDBConnected.ForeColor = System.Drawing.Color.Red;
-            this.labelDBConnected.Location = new System.Drawing.Point(42, 351);
-            this.labelDBConnected.Name = "labelDBConnected";
-            this.labelDBConnected.Size = new System.Drawing.Size(57, 13);
-            this.labelDBConnected.TabIndex = 9;
-            this.labelDBConnected.Text = "Bağlı Değil";
-            // 
-            // labelModbusConnected
-            // 
-            this.labelModbusConnected.AutoSize = true;
-            this.labelModbusConnected.ForeColor = System.Drawing.Color.Red;
-            this.labelModbusConnected.Location = new System.Drawing.Point(197, 351);
-            this.labelModbusConnected.Name = "labelModbusConnected";
-            this.labelModbusConnected.Size = new System.Drawing.Size(57, 13);
-            this.labelModbusConnected.TabIndex = 10;
-            this.labelModbusConnected.Text = "Bağlı Değil";
             // 
             // makineLabel
             // 
@@ -199,9 +186,10 @@
             // 
             this.btnClearLogs.BackColor = System.Drawing.Color.Red;
             this.btnClearLogs.Enabled = false;
+            this.btnClearLogs.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearLogs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.btnClearLogs.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnClearLogs.Location = new System.Drawing.Point(668, 367);
+            this.btnClearLogs.ForeColor = System.Drawing.Color.White;
+            this.btnClearLogs.Location = new System.Drawing.Point(654, 352);
             this.btnClearLogs.Name = "btnClearLogs";
             this.btnClearLogs.Size = new System.Drawing.Size(113, 47);
             this.btnClearLogs.TabIndex = 12;
@@ -212,15 +200,16 @@
             // generalTimer
             // 
             this.generalTimer.Enabled = true;
-            this.generalTimer.Interval = 1500;
+            this.generalTimer.Interval = 800;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
             // btnStart
             // 
-            this.btnStart.BackColor = System.Drawing.Color.Lime;
+            this.btnStart.BackColor = System.Drawing.Color.LimeGreen;
+            this.btnStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.btnStart.ForeColor = System.Drawing.Color.Black;
-            this.btnStart.Location = new System.Drawing.Point(490, 367);
+            this.btnStart.ForeColor = System.Drawing.Color.White;
+            this.btnStart.Location = new System.Drawing.Point(368, 352);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(86, 47);
             this.btnStart.TabIndex = 13;
@@ -237,9 +226,12 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(795, 446);
             this.tabControl1.TabIndex = 14;
+            this.tabControl1.TabIndexChanged += new System.EventHandler(this.tabControl1_TabIndexChanged);
             // 
             // tabIslemler
             // 
+            this.tabIslemler.Controls.Add(this.label6);
+            this.tabIslemler.Controls.Add(this.groupBox);
             this.tabIslemler.Controls.Add(this.labelTimerValue);
             this.tabIslemler.Controls.Add(this.label7);
             this.tabIslemler.Controls.Add(this.btnClearLogs);
@@ -249,13 +241,9 @@
             this.tabIslemler.Controls.Add(this.label1);
             this.tabIslemler.Controls.Add(this.label2);
             this.tabIslemler.Controls.Add(this.aktifSicaklik1);
-            this.tabIslemler.Controls.Add(this.labelModbusConnected);
             this.tabIslemler.Controls.Add(this.hedefSicaklik1);
-            this.tabIslemler.Controls.Add(this.btnConnectModbus);
             this.tabIslemler.Controls.Add(this.aktifSicaklik2);
-            this.tabIslemler.Controls.Add(this.labelDBConnected);
             this.tabIslemler.Controls.Add(this.hedefSicaklik2);
-            this.tabIslemler.Controls.Add(this.btnConnectDB);
             this.tabIslemler.Location = new System.Drawing.Point(4, 22);
             this.tabIslemler.Name = "tabIslemler";
             this.tabIslemler.Padding = new System.Windows.Forms.Padding(3);
@@ -329,6 +317,7 @@
             this.textBoxTemp2ID.Name = "textBoxTemp2ID";
             this.textBoxTemp2ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp2ID.TabIndex = 10;
+            this.textBoxTemp2ID.TextChanged += new System.EventHandler(this.textBoxPressed);
             // 
             // label4
             // 
@@ -345,6 +334,7 @@
             this.textBoxTemp1ID.Name = "textBoxTemp1ID";
             this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp1ID.TabIndex = 8;
+            this.textBoxTemp1ID.TextChanged += new System.EventHandler(this.textBoxPressed);
             // 
             // textBoxTimerID
             // 
@@ -352,6 +342,7 @@
             this.textBoxTimerID.Name = "textBoxTimerID";
             this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTimerID.TabIndex = 7;
+            this.textBoxTimerID.TextChanged += new System.EventHandler(this.textBoxPressed);
             // 
             // labelTempertureID
             // 
@@ -379,6 +370,10 @@
             this.comboBoxModbusConn.Size = new System.Drawing.Size(100, 21);
             this.comboBoxModbusConn.TabIndex = 4;
             this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
+            this.comboBoxModbusConn.Click += new System.EventHandler(this.comboBoxSelect);
+            this.comboBoxModbusConn.MouseClick += new System.Windows.Forms.MouseEventHandler(this.comboBoxSelect);
+            this.comboBoxModbusConn.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.comboBoxSelect);
+            this.comboBoxModbusConn.MouseCaptureChanged += new System.EventHandler(this.comboBoxSelect);
             // 
             // label3
             // 
@@ -419,6 +414,25 @@
             // 
             this.writerController.Tick += new System.EventHandler(this.writerController_Tick);
             // 
+            // groupBox
+            // 
+            this.groupBox.Controls.Add(this.btnConnectModbus);
+            this.groupBox.Controls.Add(this.btnConnectDB);
+            this.groupBox.Location = new System.Drawing.Point(27, 353);
+            this.groupBox.Name = "groupBox";
+            this.groupBox.Size = new System.Drawing.Size(183, 46);
+            this.groupBox.TabIndex = 18;
+            this.groupBox.TabStop = false;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(282, 271);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(35, 13);
+            this.label6.TabIndex = 19;
+            this.label6.Text = "label6";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -434,6 +448,7 @@
             this.tabIslemler.PerformLayout();
             this.tabAyarlar.ResumeLayout(false);
             this.tabAyarlar.PerformLayout();
+            this.groupBox.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -450,8 +465,6 @@
         private System.Windows.Forms.Timer writeDBTimer;
         private System.Windows.Forms.Button btnConnectDB;
         private System.Windows.Forms.Button btnConnectModbus;
-        private System.Windows.Forms.Label labelDBConnected;
-        private System.Windows.Forms.Label labelModbusConnected;
         private System.Windows.Forms.Label makineLabel;
         private System.Windows.Forms.Button btnClearLogs;
         private System.Windows.Forms.Timer generalTimer;
@@ -475,6 +488,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label labelTimerValue;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.GroupBox groupBox;
+        private System.Windows.Forms.Label label6;
     }
 }
 

@@ -98,20 +98,28 @@ namespace accdb_isi
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Modbus bağlantı hatası: " + ex.Message);
-                        return;
+                        modbusControl.DisconnectPlc();
+                        
+                        if (!string.IsNullOrEmpty(modbusControl.ConnectPlc()))
+                        {
+                            MessageBox.Show("Modbus bağlantı hatası: " + ex.Message);
+                            return;
+                        }
+                        else
+                            modbusConnected = true;
                     }
 
-                    if (modbusControl.ConnectPlc() == null)
+                    if (modbusConnected == false)
+                    {
+                        modbusControl.ConnectPlc();
                         modbusConnected = true;
+                    }
                 }
             }
             else
             {
                 if (modbusConnected)
                     modbusConnected = !modbusControl.DisconnectPlc();
-
-                modbusControl = null;
             }
             ConnectionController();
         }
@@ -120,7 +128,6 @@ namespace accdb_isi
         {
             if (connect)
             {
-                generalTimer.Enabled = false;
                 if (databasePath == string.Empty)
                 {
                     MessageBox.Show("Ayarlardan veritabanı seçin");
@@ -148,13 +155,15 @@ namespace accdb_isi
 
                 if (satirSayisi == 0)
                 {
-                    btnClearLogs.BackColor = Color.Green;
+                    btnClearLogs.BackColor = Color.LimeGreen;
+                    btnClearLogs.ForeColor = Color.White;
                     btnClearLogs.Enabled = false;
                     btnClearLogs.Text = "Loglar Temiz";
                 }
                 else
                 {
                     btnClearLogs.BackColor = Color.Red;
+                    btnClearLogs.ForeColor = Color.White;
                     btnClearLogs.Enabled = true;
                     btnClearLogs.Text = "Logları Temizle";
                 }
@@ -171,14 +180,14 @@ namespace accdb_isi
         {
             if (modbusConnected)
             {
-                labelModbusConnected.Text = "Modbus Bağlı";
-                labelModbusConnected.ForeColor = Color.Green;
+                btnConnectModbus.BackColor = Color.Red;
+                btnConnectModbus.ForeColor = Color.White;
                 btnConnectModbus.Text = "Modbus Cihazı Bağlantısını Kes";
             }
             else
             {
-                labelModbusConnected.Text = "Bağlı Değil";
-                labelModbusConnected.ForeColor = Color.Red;
+                btnConnectModbus.BackColor = Color.LimeGreen;
+                btnConnectModbus.ForeColor = Color.Black;
                 btnConnectModbus.Text = "Modbus Cihazına Bağlan";
             }
         }
@@ -187,14 +196,14 @@ namespace accdb_isi
         {
             if (dbConnected)
             {
-                labelDBConnected.Text = "Veritabanı Bağlı";
-                labelDBConnected.ForeColor = Color.Green;
+                btnConnectDB.BackColor = Color.Red;
+                btnConnectDB.ForeColor = Color.White;
                 btnConnectDB.Text = "Veritabanı Bağlantısını Kes";
             }
             else
             {
-                labelDBConnected.Text = "Bağlı Değil";
-                labelDBConnected.ForeColor = Color.Red;
+                btnConnectDB.BackColor = Color.LimeGreen;
+                btnConnectDB.ForeColor = Color.Black;
                 btnConnectDB.Text = "Veritabanına Bağlan";
             }
         }
@@ -362,12 +371,14 @@ namespace accdb_isi
             if (satirSayisi == 0)
             {
                 btnClearLogs.BackColor = Color.Green;
+                btnClearLogs.ForeColor = Color.White;
                 btnClearLogs.Enabled = false;
                 btnClearLogs.Text = "Loglar Temiz";
             }
             else
             {
                 btnClearLogs.BackColor = Color.Red;
+                btnClearLogs.ForeColor = Color.White;
                 btnClearLogs.Enabled = true;
                 btnClearLogs.Text = "Logları Temizle";
             }
@@ -487,6 +498,8 @@ namespace accdb_isi
                     labelTimerValue.Text = TimerTime;
                 else
                     labelTimerValue.Text = "00:00:00";
+
+                label6.Text = $"olculen : {modbusControl.ReadInputRegsData(tempreture2ID, 0)}\nanalog yuzde: {modbusControl.ReadInputRegsData(tempreture2ID, 1)}";
             }
             else
             {
@@ -654,7 +667,7 @@ namespace accdb_isi
             else
             {
                 btnStart.Text = "Başlat";
-                btnStart.BackColor = Color.Lime;
+                btnStart.BackColor = Color.LimeGreen;
                 btnStart.ForeColor = Color.Black;
 
                 started = false;
@@ -664,6 +677,7 @@ namespace accdb_isi
 
         private void btnDBSelect_Click(object sender, EventArgs e)
         {
+            generalTimer.Enabled = true;
             FileRead();
         }
 
@@ -676,6 +690,32 @@ namespace accdb_isi
         {
             ProcessController(false);
             MessageBox.Show("İşlem tamamlandı");
+        }
+
+        private void comboBoxSelect(object sender, MouseEventArgs e)
+        {
+            generalTimer.Enabled = false;
+        }
+
+        private void comboBoxSelect(object sender, EventArgs e)
+        {
+            generalTimer.Enabled = false;
+        }
+
+        private void textBoxPressed(object sender, EventArgs e)
+        {
+            generalTimer.Enabled = true;
+        }
+
+        private void tabControl1_TabIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedTab.Name == "tabAyarlar")
+                generalTimer.Interval = 800;
+            else if (tabControl1.SelectedTab.Name == "tabIslemler")
+            {
+                generalTimer.Interval = 3000;
+                generalTimer.Enabled = true;
+            }
         }
     }
 }
