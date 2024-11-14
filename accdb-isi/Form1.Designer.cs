@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.hedefSicaklik1 = new System.Windows.Forms.Label();
             this.aktifSicaklik1 = new System.Windows.Forms.Label();
             this.hedefSicaklik2 = new System.Windows.Forms.Label();
@@ -424,6 +425,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.tabControl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Press Kontrol Programı";
             this.tabControl1.ResumeLayout(false);
