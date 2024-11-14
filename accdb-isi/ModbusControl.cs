@@ -71,8 +71,8 @@ namespace ModbusController
         {
             try
             {
-                if (!serialPort.IsOpen)
-                    serialPort.Close();
+                modbusMaster.Dispose();
+                serialPort.Close();
                 return true;
             }
             catch
