@@ -243,10 +243,10 @@ namespace accdb_isi
                 SetSicaklik1 = 0;
                 SetSicaklik2 = 0;
 
-                operatorLabel.Text = "Operatör:";
-                makineLabel.Text = "Makine:";
-                hedefSicaklik1.Text = "Hedef Sıcaklık:";
-                hedefSicaklik2.Text = "Hedef Sıcaklık:";
+                operatorLabel.Text = "Operatör: -";
+                makineLabel.Text = "Makine: -";
+                hedefSicaklik1.Text = "Hedef Sıcaklık: -";
+                hedefSicaklik2.Text = "Hedef Sıcaklık: -";
 
                 writeDBTimer.Interval = 100;
                 writeDBTimer.Enabled = false;
@@ -262,14 +262,13 @@ namespace accdb_isi
             {
                 try
                 {
-                    if (GetModbusValues() == false)
-                        return;
-
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
-                    int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
-                    int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
-                    
-                    string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
+                    int Sicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik)) / 1000;// press1 sıcaklık
+                    int Sicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik)) / 1000;// press2 sıcaklık
+
+                    string timerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
+
+                    string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(timerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
                     string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure/3600)}:{Convert.ToInt32(SetSure/60)}:{Convert.ToInt32(SetSure%60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
 
@@ -287,7 +286,6 @@ namespace accdb_isi
                     MessageBox.Show("Veritabanına değerleri yazmada hata çıktı: " + ex.Message);
                     return;
                 }
-                
             }
         }
 
@@ -397,9 +395,6 @@ namespace accdb_isi
         {
             if (active)
             {
-                if (!started)
-                    return;
-
                 aktifSicaklik1.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
                 aktifSicaklik2.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
 
@@ -430,18 +425,15 @@ namespace accdb_isi
                 SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
                 SetSure = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSure", setTableID).Split(':')[1].Trim());
 
-                btnConnectDB.Enabled = false;
-                btnConnectModbus.Enabled = false;
-
                 try
                 {
-                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
-                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
+                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1 * 1000);
+                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2 * 1000);
 
                     TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
                     if (TimerFormat == null)
                         return;
-                    
+
                     int timerTime = Utils.Utils.TimeToPlc(SetSure, TimerFormat);
                     if (timerTime == -1)
                         return;
@@ -473,15 +465,18 @@ namespace accdb_isi
                 if (timerData != string.Empty)
                     timerInterval = Convert.ToInt32(timerData.Split(':')[1].Trim()) * 1000;
 
+                btnConnectDB.Enabled = false;
+                btnConnectModbus.Enabled = false;
+
                 writeDBTimer.Interval = timerInterval;
                 writeDBTimer.Enabled = true;
+
+                started = true;
 
                 writerController.Interval = SetSure * 1000;
                 writerController.Enabled = true;
 
                 pressStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                UpdateLabels(true);
             }
         }
 
