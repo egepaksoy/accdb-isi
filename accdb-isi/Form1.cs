@@ -391,14 +391,14 @@ namespace accdb_isi
         {
             try
             {
-                //string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
-                //string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
+                string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
+                string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
 
-                //if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
-                //{
-                //    ProcessController(false);
-                //    return false;
-                //}
+                if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
+                {
+                    ProcessController(false);
+                    return false;
+                }
 
                 string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
                 TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
@@ -409,8 +409,8 @@ namespace accdb_isi
                     return false;
                 }
 
-                //GetSicaklik1 = Convert.ToInt32(getSicaklik1) / 1000;
-                //GetSicaklik2 = Convert.ToInt32(getSicaklik2) / 1000;
+                GetSicaklik1 = Convert.ToInt32(getSicaklik1) / 1000;
+                GetSicaklik2 = Convert.ToInt32(getSicaklik2) / 1000;
 
                 TimerTime = PlcToTime(timerTime, TimerFormat);
 
