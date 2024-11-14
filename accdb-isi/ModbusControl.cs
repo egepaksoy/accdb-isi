@@ -16,13 +16,13 @@ namespace ModbusController
         public SerialPort serialPort;
         private IModbusSerialMaster modbusMaster;
 
+        public bool connectedRTU = false;
+
         private int readTimeout;
         private int writeTimeout;
 
-        public ModbusControl(string address, int ReadTimeout = 300, int WriteTimeout = 300)
+        public ModbusControl(int ReadTimeout = 300, int WriteTimeout = 300)
         {
-            RTUConnect(address);
-
             readTimeout = ReadTimeout;
             writeTimeout = WriteTimeout;
 
@@ -36,6 +36,7 @@ namespace ModbusController
                 serialPort = new SerialPort(portAddress, 9600, Parity.None, 8, StopBits.One);
                 modbusMaster = new ModbusFactory().CreateRtuMaster(serialPort);
 
+                connectedRTU = true;
                 return null;
             }
             catch (Exception e)

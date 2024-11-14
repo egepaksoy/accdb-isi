@@ -224,7 +224,6 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(795, 446);
             this.tabControl1.TabIndex = 14;
-            this.tabControl1.TabIndexChanged += new System.EventHandler(this.tabControl1_TabIndexChanged);
             // 
             // tabIslemler
             // 
@@ -308,6 +307,7 @@
             this.textBoxSetTableID.Name = "textBoxSetTableID";
             this.textBoxSetTableID.Size = new System.Drawing.Size(100, 20);
             this.textBoxSetTableID.TabIndex = 12;
+            this.textBoxSetTableID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // label5
             // 
@@ -324,6 +324,7 @@
             this.textBoxTemp2ID.Name = "textBoxTemp2ID";
             this.textBoxTemp2ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp2ID.TabIndex = 10;
+            this.textBoxTemp2ID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // label4
             // 
@@ -340,6 +341,7 @@
             this.textBoxTemp1ID.Name = "textBoxTemp1ID";
             this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTemp1ID.TabIndex = 8;
+            this.textBoxTemp1ID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // textBoxTimerID
             // 
@@ -347,6 +349,7 @@
             this.textBoxTimerID.Name = "textBoxTimerID";
             this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
             this.textBoxTimerID.TabIndex = 7;
+            this.textBoxTimerID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // labelTempertureID
             // 
@@ -374,6 +377,7 @@
             this.comboBoxModbusConn.Size = new System.Drawing.Size(100, 21);
             this.comboBoxModbusConn.TabIndex = 4;
             this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
+            this.comboBoxModbusConn.Click += new System.EventHandler(this.comboBoxModbusConn_Click);
             // 
             // label3
             // 
@@ -390,6 +394,7 @@
             this.textBoxDBPath.Name = "textBoxDBPath";
             this.textBoxDBPath.Size = new System.Drawing.Size(422, 20);
             this.textBoxDBPath.TabIndex = 2;
+            this.textBoxDBPath.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // btnDBSelect
             // 

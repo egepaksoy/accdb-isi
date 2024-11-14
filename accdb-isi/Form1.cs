@@ -15,6 +15,7 @@ using System.IO.Ports;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Utils;
 
 
 namespace accdb_isi
@@ -57,6 +58,7 @@ namespace accdb_isi
         {
             InitializeComponent();
             databaseControl = new DatabaseControl(databasePath);
+            modbusControl = new ModbusControl();
         }
 
         private void btnConnectDB_Click(object sender, EventArgs e)
@@ -88,7 +90,9 @@ namespace accdb_isi
 
                     try
                     {
-                        modbusControl = new ModbusControl(modbusPort);
+                        if (!modbusControl.connectedRTU)
+                            modbusControl.RTUConnect(modbusPort);
+                        modbusControl.ConnectPlc();
                     }
                     catch (Exception ex)
                     {
@@ -288,66 +292,6 @@ namespace accdb_isi
             }
         }
 
-        private string PlcToTime(string TimerTime, string timerFormat)
-        {
-            double hour = 0;
-            double minute = 0;
-            double second = 0;
-
-            int timerTime = Convert.ToInt32(TimerTime);
-
-            if (string.IsNullOrEmpty(TimerTime))
-            {
-                ProcessController(false);
-                MessageBox.Show("Zaman degeri cekilemedi");
-                return null;
-            }    
-
-            switch (timerFormat)
-            {
-                case "0":
-                    second = timerTime / 100;
-                    break;
-                case "1":
-                    second = timerTime / 10;
-                    break;
-                case "2":
-                    second = timerTime;
-                    break;
-                case "3":
-                    second = timerTime % 100;
-                    minute = Convert.ToInt32(timerTime / 100);
-                    break;
-                case "4":
-                    minute = timerTime / 10;
-                    break;
-                case "5":
-                    minute = timerTime;
-                    break;
-                case "6":
-                    minute = timerTime % 100;
-                    hour = Convert.ToInt32(timerTime / 100);
-                    break;
-                case "7":
-                    hour = timerTime / 10;
-                    break;
-                case "8":
-                    hour = timerTime;
-                    break;
-                default:
-                    MessageBox.Show($"Plc formatı {timerFormat} bulunamadı");
-                    return null;
-            }
-
-            if (minute >= 60 || second >= 60 || hour >= 24)
-            {
-                MessageBox.Show($"Timer zamanında sıkıntı çıktı: {hour}:{minute}:{second}");
-                return null;
-            }
-
-            return $"{hour}:{minute}:{second}";
-        }
-
         private void btnClearLogs_Click(object sender, EventArgs e)
         {
             try
@@ -398,7 +342,14 @@ namespace accdb_isi
                 if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(TimerFormat))
                     ProcessController(false);
 
-                TimerTime = PlcToTime(timerTime, TimerFormat);
+                string convertedTime = Utils.Utils.PlcToTime(timerTime, TimerFormat);
+
+                if (string.IsNullOrEmpty(convertedTime))
+                {
+                    ProcessController(false);
+                    MessageBox.Show("PLC zaman verisi çevrilemedi");
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -429,31 +380,8 @@ namespace accdb_isi
 
         private void generalTimer_Tick(object sender, EventArgs e)
         {
-            if (tabControl1.SelectedTab.Name == "tabAyarlar")
-            {
-                portNames = SerialPort.GetPortNames();
-
-                if (portNames != oldPortNames)
-                {
-                    oldPortNames = portNames;
-                    comboBoxModbusConn.Items.Clear();
-                    comboBoxModbusConn.Items.AddRange(portNames);
-                }
-                
-                if (textBoxDBPath.Text != databasePath)
-                    textBoxDBPath.Text = databasePath;
-
-                if (!string.IsNullOrEmpty(textBoxTimerID.Text) && Convert.ToInt32(textBoxTimerID.Text) != timerID)
-                    timerID = Convert.ToInt32(textBoxTimerID.Text);
-                if (!string.IsNullOrEmpty(textBoxTemp1ID.Text) && Convert.ToInt32(textBoxTemp1ID.Text) != timerID)
-                    tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
-                if (!string.IsNullOrEmpty(textBoxTemp2ID.Text) && Convert.ToInt32(textBoxTemp2ID.Text) != timerID)
-                    tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
-            }
-
             if (modbusConnected && tabControl1.SelectedTab.Name == "tabIslemler")
                 UpdateLabels(true);
-
         }
 
         private void FileRead()
@@ -484,7 +412,7 @@ namespace accdb_isi
                 //    labelTimerValue.Text = TimerTime;
                 //else
                 //    labelTimerValue.Text = "00:00:00";
-                labelTimerValue.Text = PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
+                labelTimerValue.Text = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
             }
             else
             {
@@ -493,51 +421,6 @@ namespace accdb_isi
              
                 labelTimerValue.Text = "00:00:00";
             }
-        }
-
-        public int TimeToPlc(int setSure, string format)
-        {
-            switch (format)
-            {
-                case "0":
-                    if (setSure < 100)
-                        return setSure / 100;
-                    break;
-                case "1":
-                    if (setSure < 1000)
-                        return setSure / 10;
-                    break;
-                case "2":
-                    if (setSure < 10000)
-                        return setSure;
-                    break;
-                case "3":
-                    if (setSure < 600)
-                        return Convert.ToInt32(setSure / 60) * 100 + setSure % 60;
-                    break;
-                case "4":
-                    if (setSure < 60000)
-                        return (setSure / 60) / 10;
-                    break;
-                case "5":
-                    if (setSure < 600000)
-                        return Convert.ToInt32(setSure / 60);
-                    break;
-                case "6":
-                    if (setSure < 360000)
-                        return Convert.ToInt32(setSure / 3600) * 100 + setSure % 3600;
-                    break;
-                case "7":
-                    if (setSure < 3600000)
-                        return Convert.ToInt32(setSure / 3600) / 10;
-                    break;
-                case "8":
-                    if (setSure < 36000000)
-                        return Convert.ToInt32(setSure / 3600);
-                    break;
-            }
-            MessageBox.Show($"Veritabanındaki süre formatı plc'deki ile uyumsuz\nPlc Formatı: {format} Veritabanı süre: {setSure}\nPlc formatını değiştirin.");
-            return -1;
         }
 
         public void FirstStart()
@@ -563,7 +446,7 @@ namespace accdb_isi
                     if (TimerFormat == null)
                         return;
                     
-                    int timerTime = TimeToPlc(SetSure, TimerFormat);
+                    int timerTime = Utils.Utils.TimeToPlc(SetSure, TimerFormat);
                     if (timerTime == -1)
                         return;
 
@@ -662,8 +545,8 @@ namespace accdb_isi
 
         private void btnDBSelect_Click(object sender, EventArgs e)
         {
-            generalTimer.Enabled = true;
             FileRead();
+            textBoxDBPath.Text = databasePath;
         }
 
         private void comboBoxModbusConn_SelectionChangeCommited(object sender, EventArgs e)
@@ -677,17 +560,31 @@ namespace accdb_isi
             MessageBox.Show("İşlem tamamlandı");
         }
 
-        private void tabControl1_TabIndexChanged(object sender, EventArgs e)
+        private void settingsTextsChanged(object sender, EventArgs e)
         {
-            if (tabControl1.SelectedTab.Name == "tabAyarlar")
+            if (string.IsNullOrEmpty(textBoxDBPath.Text) && databasePath != textBoxDBPath.Text)
+                databasePath = textBoxDBPath.Text;
+
+            if (!string.IsNullOrEmpty(textBoxSetTableID.Text) && Convert.ToInt32(textBoxSetTableID.Text) != setTableID)
+                setTableID = Convert.ToInt32(textBoxSetTableID.Text);
+
+            if (!string.IsNullOrEmpty(textBoxTimerID.Text) && Convert.ToInt32(textBoxTimerID.Text) != timerID)
+                timerID = Convert.ToInt32(textBoxTimerID.Text);
+            if (!string.IsNullOrEmpty(textBoxTemp1ID.Text) && Convert.ToInt32(textBoxTemp1ID.Text) != timerID)
+                tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
+            if (!string.IsNullOrEmpty(textBoxTemp2ID.Text) && Convert.ToInt32(textBoxTemp2ID.Text) != timerID)
+                tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
+        }
+
+        private void comboBoxModbusConn_Click(object sender, EventArgs e)
+        {
+            portNames = SerialPort.GetPortNames();
+
+            if (portNames != oldPortNames)
             {
-                generalTimer.Interval = 800;
-                generalTimer.Enabled = true;
-            }
-            else if (tabControl1.SelectedTab.Name == "tabIslemler")
-            {
-                generalTimer.Interval = 3000;
-                generalTimer.Enabled = true;
+                oldPortNames = portNames;
+                comboBoxModbusConn.Items.Clear();
+                comboBoxModbusConn.Items.AddRange(portNames);
             }
         }
     }
