@@ -109,19 +109,16 @@ namespace accdb_isi
                         else
                             modbusConnected = true;
                     }
-
-                    if (modbusConnected == false)
-                    {
-                        modbusControl.ConnectPlc();
-                        modbusConnected = true;
-                    }
                 }
+                modbusControl.ConnectPlc();
+                modbusConnected = true;
             }
             else
             {
                 if (modbusConnected)
                 {
-                    modbusConnected = !modbusControl.DisconnectPlc();
+                    modbusControl.DisconnectPlc();
+                    modbusConnected = false;
                     modbusControl = null;
                 }
             }
@@ -212,7 +209,6 @@ namespace accdb_isi
             }
         }
 
-        // bu ikisini de kontrol edicek, ikisi de bağlı ise olucak
         private void ConnectionController()
         {
             if (dbConnected)
@@ -396,10 +392,7 @@ namespace accdb_isi
             Thread tempThread = new Thread(GetTempValues);
             tempThread.Start();
 
-            tempThread.Join();
-            timerThread.Join();
-
-            return (started);
+            return started;
         }
 
         private void GetTimerValue()
@@ -485,16 +478,20 @@ namespace accdb_isi
         {
             if (active)
             {
-                if (GetModbusValues() == false)
+                if (!started)
                     return;
 
-                aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
-                aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
+                //aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
+                //aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
 
-                if (!string.IsNullOrEmpty(TimerTime))
-                    labelTimerValue.Text = TimerTime;
-                else
-                    labelTimerValue.Text = "00:00:00";
+                aktifSicaklik1.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
+                aktifSicaklik2.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
+
+                //if (!string.IsNullOrEmpty(TimerTime))
+                //    labelTimerValue.Text = TimerTime;
+                //else
+                //    labelTimerValue.Text = "00:00:00";
+                labelTimerValue.Text = PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
             }
             else
             {
