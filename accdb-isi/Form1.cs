@@ -116,7 +116,6 @@ namespace accdb_isi
                 {
                     modbusControl.DisconnectPlc();
                     modbusConnected = false;
-                    modbusControl = null;
                 }
             }
             ConnectionController();
@@ -380,8 +379,7 @@ namespace accdb_isi
 
         private void generalTimer_Tick(object sender, EventArgs e)
         {
-            if (modbusConnected && tabControl1.SelectedTab.Name == "tabIslemler")
-                UpdateLabels(true);
+            UpdateLabels(modbusConnected & tabControl1.SelectedTab.Name == "tabIslemler");
         }
 
         private void FileRead()
