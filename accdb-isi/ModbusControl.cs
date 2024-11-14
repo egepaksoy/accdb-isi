@@ -164,7 +164,7 @@ namespace ModbusController
             {
                 gelenVeri.Clear();
 
-                inputRegisters = modbusMaster.ReadHoldingRegisters(slaveId, inputAddress, numRegisters);
+                inputRegisters = modbusMaster.ReadInputRegisters(slaveId, inputAddress, numRegisters);
                 foreach (ushort inputRegister in inputRegisters)
                     gelenVeri.Add(inputRegister.ToString());
 
