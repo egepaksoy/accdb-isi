@@ -14,6 +14,7 @@ using Addresses;
 using System.IO.Ports;
 using System.Diagnostics.Eventing.Reader;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 
 namespace accdb_isi
@@ -389,38 +390,54 @@ namespace accdb_isi
 
         private bool GetModbusValues()
         {
+            Thread timerThread = new Thread(GetTempValues);
+            timerThread.Start();
+
+            Thread tempThread = new Thread(GetTempValues);
+            tempThread.Start();
+
+            tempThread.Join();
+            timerThread.Join();
+
+            return (started);
+        }
+
+        private void GetTimerValue()
+        {
+            try
+            {
+                string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
+                TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+
+                if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(TimerFormat))
+                    ProcessController(false);
+
+                TimerTime = PlcToTime(timerTime, TimerFormat);
+            }
+            catch (Exception ex)
+            {
+                ProcessController(false);
+                MessageBox.Show("Zamanlayici cihazından veri alma sorunu: " + ex.Message);
+            }
+        }
+
+        private void GetTempValues()
+        {
             try
             {
                 string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
                 string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
 
                 if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
-                {
                     ProcessController(false);
-                    return false;
-                }
-
-                string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
-                TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
-
-                if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(TimerFormat))
-                {
-                    ProcessController(false);
-                    return false;
-                }
 
                 GetSicaklik1 = Convert.ToInt32(getSicaklik1) / 1000;
                 GetSicaklik2 = Convert.ToInt32(getSicaklik2) / 1000;
-
-                TimerTime = PlcToTime(timerTime, TimerFormat);
-
-                return true;
             }
             catch (Exception ex)
             {
                 ProcessController(false);
-                MessageBox.Show("Modbus cihazlarından veri alma sorunu: " + ex.Message);
-                return false;
+                MessageBox.Show("Sıcaklık cihazlarından veri alma sorunu: " + ex.Message);
             }
         }
 
