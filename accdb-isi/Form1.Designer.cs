@@ -76,9 +76,9 @@
             this.hedefSicaklik1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.hedefSicaklik1.Location = new System.Drawing.Point(308, 138);
             this.hedefSicaklik1.Name = "hedefSicaklik1";
-            this.hedefSicaklik1.Size = new System.Drawing.Size(106, 18);
+            this.hedefSicaklik1.Size = new System.Drawing.Size(115, 18);
             this.hedefSicaklik1.TabIndex = 0;
-            this.hedefSicaklik1.Text = "Hedef Sıcaklık:";
+            this.hedefSicaklik1.Text = "Hedef Sıcaklık: -";
             // 
             // aktifSicaklik1
             // 
@@ -86,9 +86,9 @@
             this.aktifSicaklik1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.aktifSicaklik1.Location = new System.Drawing.Point(308, 162);
             this.aktifSicaklik1.Name = "aktifSicaklik1";
-            this.aktifSicaklik1.Size = new System.Drawing.Size(91, 18);
+            this.aktifSicaklik1.Size = new System.Drawing.Size(104, 18);
             this.aktifSicaklik1.TabIndex = 1;
-            this.aktifSicaklik1.Text = "Aktif Sıcaklık";
+            this.aktifSicaklik1.Text = "Aktif Sıcaklık: -";
             // 
             // hedefSicaklik2
             // 
@@ -96,9 +96,9 @@
             this.hedefSicaklik2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.hedefSicaklik2.Location = new System.Drawing.Point(581, 138);
             this.hedefSicaklik2.Name = "hedefSicaklik2";
-            this.hedefSicaklik2.Size = new System.Drawing.Size(106, 18);
+            this.hedefSicaklik2.Size = new System.Drawing.Size(115, 18);
             this.hedefSicaklik2.TabIndex = 2;
-            this.hedefSicaklik2.Text = "Hedef Sıcaklık:";
+            this.hedefSicaklik2.Text = "Hedef Sıcaklık: -";
             // 
             // aktifSicaklik2
             // 
@@ -106,9 +106,9 @@
             this.aktifSicaklik2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.aktifSicaklik2.Location = new System.Drawing.Point(581, 162);
             this.aktifSicaklik2.Name = "aktifSicaklik2";
-            this.aktifSicaklik2.Size = new System.Drawing.Size(95, 18);
+            this.aktifSicaklik2.Size = new System.Drawing.Size(104, 18);
             this.aktifSicaklik2.TabIndex = 3;
-            this.aktifSicaklik2.Text = "Aktif Sıcaklık:";
+            this.aktifSicaklik2.Text = "Aktif Sıcaklık: -";
             // 
             // operatorLabel
             // 
@@ -198,7 +198,7 @@
             // generalTimer
             // 
             this.generalTimer.Enabled = true;
-            this.generalTimer.Interval = 800;
+            this.generalTimer.Interval = 3000;
             this.generalTimer.Tick += new System.EventHandler(this.generalTimer_Tick);
             // 
             // btnStart
@@ -264,9 +264,9 @@
             this.labelTimerValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.labelTimerValue.Location = new System.Drawing.Point(39, 138);
             this.labelTimerValue.Name = "labelTimerValue";
-            this.labelTimerValue.Size = new System.Drawing.Size(120, 31);
+            this.labelTimerValue.Size = new System.Drawing.Size(57, 31);
             this.labelTimerValue.TabIndex = 17;
-            this.labelTimerValue.Text = "00:00:00";
+            this.labelTimerValue.Text = "-:-:-";
             // 
             // label7
             // 

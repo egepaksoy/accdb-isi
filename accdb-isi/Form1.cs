@@ -402,24 +402,22 @@ namespace accdb_isi
                 if (!started)
                     return;
 
-                //aktifSicaklik1.Text = "Aktif Sıcaklık: " + GetSicaklik1.ToString();
-                //aktifSicaklik2.Text = "Aktif Sıcaklık: " + GetSicaklik2.ToString();
-
                 aktifSicaklik1.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
                 aktifSicaklik2.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
 
-                //if (!string.IsNullOrEmpty(TimerTime))
-                //    labelTimerValue.Text = TimerTime;
-                //else
-                //    labelTimerValue.Text = "00:00:00";
-                labelTimerValue.Text = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
+                string timerTimeData = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
+
+                if (timerTimeData != null)
+                    labelTimerValue.Text = timerTimeData;
+                else
+                    labelTimerValue.Text = "-:-:-";
             }
             else
             {
-                aktifSicaklik1.Text = "Aktif Sıcaklık: ";
-                aktifSicaklik2.Text = "Aktif Sıcaklık: ";
+                aktifSicaklik1.Text = "Aktif Sıcaklık: -";
+                aktifSicaklik2.Text = "Aktif Sıcaklık: -";
              
-                labelTimerValue.Text = "00:00:00";
+                labelTimerValue.Text = "-:-:-";
             }
         }
 
