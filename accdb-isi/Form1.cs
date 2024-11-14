@@ -61,14 +61,7 @@ namespace accdb_isi
 
         private void btnConnectDB_Click(object sender, EventArgs e)
         {
-            if (btnConnectDB.Text == "Veritabanına Bağlan")
-            {
-                ConnectDB(true);
-            }
-            else
-            {
-                ConnectDB(false);
-            }
+            ConnectDB(btnConnectDB.Text == "Veritabanına Bağlan");
         }
 
         private void btnConnectModbus_Click(object sender, EventArgs e)
