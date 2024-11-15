@@ -49,14 +49,22 @@ namespace accdb_isi
         
         bool dbConnected = false;
         bool modbusConnected = false;
+        bool threadsCreated = false;
         
         bool started = false;
 
+        bool running = true;
+
         string pressStartTime = string.Empty;
+
+        Thread temp1UpdateThread;
+        Thread temp2UpdateThread;
+        Thread timerUpdateThread;
 
         public Form1()
         {
             InitializeComponent();
+
             databaseControl = new DatabaseControl(databasePath);
             modbusControl = new ModbusControl();
         }
@@ -69,6 +77,16 @@ namespace accdb_isi
         private void btnConnectModbus_Click(object sender, EventArgs e)
         {
             ConnectModbus(btnConnectModbus.Text == "Modbus Cihazına Bağlan");
+
+            if (threadsCreated == false)
+            {
+                temp1UpdateThread = new Thread(() => UpdateTempLabel(aktifSicaklik1, tempreture1ID));
+                temp2UpdateThread = new Thread(() => UpdateTempLabel(aktifSicaklik2, tempreture2ID));
+
+                timerUpdateThread = new Thread(() => UpdateTimeLabel(labelTimerValue, timerID));
+
+                threadsCreated = true;
+            }
         }
 
         private void ConnectModbus(bool connect)
@@ -391,19 +409,65 @@ namespace accdb_isi
                 databasePath = openFileDialog.FileName;
         }
 
+        public void UpdateTempLabel(Label label, int tempSlaveID)
+        {
+            string modbusSicakligi = "-";
+
+            while (running)
+            {
+                if (!modbusConnected) continue;
+
+                try
+                {
+                    modbusSicakligi = modbusControl.ReadInputRegsData(tempSlaveID, (int)InputRegAddresses.olculenSicaklik);
+                    if (string.IsNullOrEmpty(modbusSicakligi))
+                        continue;
+
+                    modbusSicakligi = $"{Convert.ToInt32(modbusSicakligi) / 1000}";
+                }
+                catch
+                {
+                    modbusSicakligi = "-";
+                }
+
+                label.Text = $"Aktif Sıcaklık: {modbusSicakligi}";
+            }
+        }
+
+        public void UpdateTimeLabel(Label label, int timerSlaveID)
+        {
+            string timerTimeData = "-:-:-";
+
+            while (running)
+            {
+                if (!modbusConnected) continue;
+
+                try
+                {
+                    timerTimeData = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerSlaveID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerSlaveID, (int)HoldRegAddresses.timerFormat));
+                    if (string.IsNullOrEmpty(timerTimeData))
+                        continue;
+                }
+                catch
+                {
+                    timerTimeData = "-:-:-";
+                }
+
+                label.Text = timerTimeData;
+            }
+            
+        }
+
         public void UpdateLabels(bool active)
         {
             if (active)
             {
-                aktifSicaklik1.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
-                aktifSicaklik2.Text = $"Aktif Sıcaklık: {Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik)) / 1000}";
-
-                string timerTimeData = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
-
-                if (timerTimeData != null)
-                    labelTimerValue.Text = timerTimeData;
-                else
-                    labelTimerValue.Text = "-:-:-";
+                if (!temp1UpdateThread.IsAlive)
+                    temp1UpdateThread.Start();
+                if (!temp2UpdateThread.IsAlive)
+                    temp2UpdateThread.Start();
+                if (!timerUpdateThread.IsAlive)
+                    timerUpdateThread.Start();
             }
             else
             {
@@ -577,6 +641,24 @@ namespace accdb_isi
                 comboBoxModbusConn.Items.Clear();
                 comboBoxModbusConn.Items.AddRange(portNames);
             }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            running = false;
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (temp1UpdateThread.IsBackground || temp1UpdateThread.IsAlive)
+                temp1UpdateThread.Abort();
+
+            if (temp2UpdateThread.IsBackground || temp2UpdateThread.IsAlive)
+                temp2UpdateThread.Abort();
+
+            if (timerUpdateThread.IsBackground || timerUpdateThread.IsAlive)
+                timerUpdateThread.Abort();
+
         }
     }
 }

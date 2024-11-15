@@ -429,6 +429,8 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Press Kontrol Programı";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.tabControl1.ResumeLayout(false);
             this.tabIslemler.ResumeLayout(false);
             this.tabIslemler.PerformLayout();
