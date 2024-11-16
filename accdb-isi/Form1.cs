@@ -36,14 +36,16 @@ namespace accdb_isi
         string operatorName = string.Empty;
         string makineName = string.Empty;
 
-        string TimerTime = string.Empty;
-        string TimerFormat = string.Empty;
+        int SetSicaklik1 = int.MinValue;
+        int SetSicaklik2 = int.MinValue;
+        
         int SetSure = 0;
 
-        int SetSicaklik1 = 0;
-        int SetSicaklik2 = 0;
-        int GetSicaklik1 = 0;
-        int GetSicaklik2 = 0;
+        int GetSicaklik1 = int.MinValue;
+        int GetSicaklik2 = int.MinValue;
+
+        string TimerTime = string.Empty;
+        string TimerFormat = string.Empty;
 
         int setTableID = -1;
         
@@ -57,9 +59,7 @@ namespace accdb_isi
 
         string pressStartTime = string.Empty;
 
-        Thread temp1UpdateThread;
-        Thread temp2UpdateThread;
-        Thread timerUpdateThread;
+        Thread updaterThread;
 
         public Form1()
         {
@@ -80,10 +80,7 @@ namespace accdb_isi
 
             if (threadsCreated == false)
             {
-                temp1UpdateThread = new Thread(() => UpdateTempLabel(aktifSicaklik1, tempreture1ID));
-                temp2UpdateThread = new Thread(() => UpdateTempLabel(aktifSicaklik2, tempreture2ID));
-
-                timerUpdateThread = new Thread(() => UpdateTimeLabel(labelTimerValue, timerID));
+                updaterThread = new Thread(UpdateValues);
 
                 threadsCreated = true;
             }
@@ -127,6 +124,8 @@ namespace accdb_isi
                 }
                 modbusControl.ConnectPlc();
                 modbusConnected = true;
+
+                TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
             }
             else
             {
@@ -281,10 +280,10 @@ namespace accdb_isi
                 try
                 {
                     string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
-                    int Sicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik)) / 1000;// press1 sıcaklık
-                    int Sicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik)) / 1000;// press2 sıcaklık
+                    int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
+                    int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
 
-                    string timerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat));
+                    string timerTime = TimerTime;
 
                     string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(timerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
@@ -336,63 +335,6 @@ namespace accdb_isi
             }
         }
 
-        private bool GetModbusValues()
-        {
-            Thread timerThread = new Thread(GetTempValues);
-            timerThread.Start();
-
-            Thread tempThread = new Thread(GetTempValues);
-            tempThread.Start();
-
-            return started;
-        }
-
-        private void GetTimerValue()
-        {
-            try
-            {
-                string timerTime = modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue);
-                TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
-
-                if (string.IsNullOrEmpty(timerTime) || string.IsNullOrEmpty(TimerFormat))
-                    ProcessController(false);
-
-                string convertedTime = Utils.Utils.PlcToTime(timerTime, TimerFormat);
-
-                if (string.IsNullOrEmpty(convertedTime))
-                {
-                    ProcessController(false);
-                    MessageBox.Show("PLC zaman verisi çevrilemedi");
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                ProcessController(false);
-                MessageBox.Show("Zamanlayici cihazından veri alma sorunu: " + ex.Message);
-            }
-        }
-
-        private void GetTempValues()
-        {
-            try
-            {
-                string getSicaklik1 = modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik);
-                string getSicaklik2 = modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik);
-
-                if (string.IsNullOrEmpty(getSicaklik1) || string.IsNullOrEmpty(getSicaklik2))
-                    ProcessController(false);
-
-                GetSicaklik1 = Convert.ToInt32(getSicaklik1) / 1000;
-                GetSicaklik2 = Convert.ToInt32(getSicaklik2) / 1000;
-            }
-            catch (Exception ex)
-            {
-                ProcessController(false);
-                MessageBox.Show("Sıcaklık cihazlarından veri alma sorunu: " + ex.Message);
-            }
-        }
-
         private void generalTimer_Tick(object sender, EventArgs e)
         {
             UpdateLabels(modbusConnected & tabControl1.SelectedTab.Name == "tabIslemler");
@@ -409,73 +351,55 @@ namespace accdb_isi
                 databasePath = openFileDialog.FileName;
         }
 
-        public void UpdateTempLabel(Label label, int tempSlaveID)
+        public void UpdateValues()
         {
-            string modbusSicakligi = "-";
-
             while (running)
             {
-                if (!modbusConnected) continue;
-
-                try
+                if (modbusConnected)
                 {
-                    modbusSicakligi = modbusControl.ReadInputRegsData(tempSlaveID, (int)InputRegAddresses.olculenSicaklik);
-                    if (string.IsNullOrEmpty(modbusSicakligi))
-                        continue;
+                    try
+                    {
+                        GetSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
+                        GetSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
 
-                    modbusSicakligi = $"{Convert.ToInt32(modbusSicakligi) / 1000}";
-                }
-                catch
-                {
-                    modbusSicakligi = "-";
-                }
+                        TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
+                    }
+                    catch
+                    {
+                        GetSicaklik1 = int.MinValue;
+                        GetSicaklik2 = int.MinValue;
 
-                label.Text = $"Aktif Sıcaklık: {modbusSicakligi}";
+                        TimerTime = null;
+                    }
+                }
             }
-        }
-
-        public void UpdateTimeLabel(Label label, int timerSlaveID)
-        {
-            string timerTimeData = "-:-:-";
-
-            while (running)
-            {
-                if (!modbusConnected) continue;
-
-                try
-                {
-                    timerTimeData = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerSlaveID, (int)InputRegAddresses.timerValue), modbusControl.ReadHoldRegsData(timerSlaveID, (int)HoldRegAddresses.timerFormat));
-                    if (string.IsNullOrEmpty(timerTimeData))
-                        continue;
-                }
-                catch
-                {
-                    timerTimeData = "-:-:-";
-                }
-
-                label.Text = timerTimeData;
-            }
-            
         }
 
         public void UpdateLabels(bool active)
         {
+            string tempVal1 = "-";
+            string tempVal2 = "-";
+
+            string timeVal = "-:-:-";
+
             if (active)
             {
-                if (!temp1UpdateThread.IsAlive)
-                    temp1UpdateThread.Start();
-                if (!temp2UpdateThread.IsAlive)
-                    temp2UpdateThread.Start();
-                if (!timerUpdateThread.IsAlive)
-                    timerUpdateThread.Start();
+                if (!updaterThread.IsAlive)
+                    updaterThread.Start();
+
+
+                if (GetSicaklik1 != int.MinValue)
+                    tempVal1 = GetSicaklik1.ToString();
+                if (GetSicaklik2 != int.MinValue)
+                    tempVal2 = GetSicaklik2.ToString();
+                
+                if (!string.IsNullOrEmpty(TimerTime))
+                    timeVal = TimerTime;
             }
-            else
-            {
-                aktifSicaklik1.Text = "Aktif Sıcaklık: -";
-                aktifSicaklik2.Text = "Aktif Sıcaklık: -";
-             
-                labelTimerValue.Text = "-:-:-";
-            }
+            aktifSicaklik1.Text = $"Aktif Sıcaklık: {tempVal1}";
+            aktifSicaklik2.Text = $"Aktif Sıcaklık: {tempVal1}";
+
+            labelTimerValue.Text = timeVal;
         }
 
         public void FirstStart()
@@ -650,15 +574,12 @@ namespace accdb_isi
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (temp1UpdateThread.IsBackground || temp1UpdateThread.IsAlive)
-                temp1UpdateThread.Abort();
+            Application.ExitThread();
 
-            if (temp2UpdateThread.IsBackground || temp2UpdateThread.IsAlive)
-                temp2UpdateThread.Abort();
+            if (updaterThread.IsBackground || updaterThread.IsAlive)
+                updaterThread.Abort();
 
-            if (timerUpdateThread.IsBackground || timerUpdateThread.IsAlive)
-                timerUpdateThread.Abort();
-
+            Application.Exit();
         }
     }
 }

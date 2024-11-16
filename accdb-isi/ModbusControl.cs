@@ -170,6 +170,7 @@ namespace ModbusController
             }
             catch
             {
+                MessageBox.Show($"Plc'den (inputreg)veri okuma hatası. Plc ID: {SlaveId}");
                 return returnData;
             }
             
@@ -202,7 +203,7 @@ namespace ModbusController
             }
             catch
             {
-                MessageBox.Show($"Plc'den veri okuma hatası. Plc ID: {SlaveId}");
+                MessageBox.Show($"Plc'den (holdreg)veri okuma hatası. Plc ID: {SlaveId}");
                 return returnData;
             }
 
