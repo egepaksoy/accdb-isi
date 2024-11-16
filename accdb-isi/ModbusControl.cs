@@ -168,9 +168,9 @@ namespace ModbusController
                 foreach (ushort inputRegister in inputRegisters)
                     gelenVeri.Add(inputRegister.ToString());
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show($"Plc'den (inputreg)veri okuma hatası. Plc ID: {SlaveId}");
+                MessageBox.Show($"Plc'den (inputreg)veri okuma hatası. Plc ID: {SlaveId}\n{ex.Message}");
                 return returnData;
             }
             
@@ -201,9 +201,9 @@ namespace ModbusController
                 foreach (ushort holdingRegister in holdingRegisters)
                     gelenVeri.Add(holdingRegister.ToString());
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show($"Plc'den (holdreg)veri okuma hatası. Plc ID: {SlaveId}");
+                MessageBox.Show($"Plc'den (holdreg)veri okuma hatası. Plc ID: {SlaveId}\n{ex.Message}");
                 return returnData;
             }
 
