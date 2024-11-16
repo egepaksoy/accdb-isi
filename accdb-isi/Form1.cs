@@ -570,12 +570,11 @@ namespace accdb_isi
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             running = false;
+            Application.ExitThread();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.ExitThread();
-
             if (updaterThread.IsBackground || updaterThread.IsAlive)
                 updaterThread.Abort();
 
