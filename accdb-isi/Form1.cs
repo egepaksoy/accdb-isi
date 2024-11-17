@@ -550,7 +550,7 @@ namespace accdb_isi
 
         private void comboBoxModbusConn_SelectionChangeCommited(object sender, EventArgs e)
         {
-            modbusPort = comboBoxModbusConn.SelectedItem.ToString();
+            modbusPort = comboBoxModbusConn.Text;
         }
 
         private void writerController_Tick(object sender, EventArgs e)
