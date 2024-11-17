@@ -38,7 +38,7 @@ namespace accdb_isi
 
         int SetSicaklik1 = int.MinValue;
         int SetSicaklik2 = int.MinValue;
-        
+
         int SetSure = 0;
 
         int GetSicaklik1 = int.MinValue;
@@ -48,7 +48,7 @@ namespace accdb_isi
         string TimerFormat = string.Empty;
 
         int setTableID = -1;
-        
+
         bool dbConnected = false;
         bool modbusConnected = false;
         bool threadsCreated = false;
@@ -114,7 +114,7 @@ namespace accdb_isi
                     catch (Exception ex)
                     {
                         modbusControl.DisconnectPlc();
-                        
+
                         if (!string.IsNullOrEmpty(modbusControl.ConnectPlc()))
                         {
                             MessageBox.Show("Modbus bağlantı hatası: " + ex.Message);
@@ -289,9 +289,10 @@ namespace accdb_isi
 
                     string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(timerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
-                    string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure/3600)}:{Convert.ToInt32(SetSure/60)}:{Convert.ToInt32(SetSure%60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
+                    string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure / 3600)}:{Convert.ToInt32(SetSure / 60)}:{Convert.ToInt32(SetSure % 60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
 
-                    string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
+                    //string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
+                    string errMessage = null;
                     if (!string.IsNullOrEmpty(errMessage))
                     {
                         ProcessController(false);
@@ -365,10 +366,13 @@ namespace accdb_isi
                         {
                             try
                             {
-                                GetSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
-                                GetSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
+                                if (modbusConnected)
+                                    GetSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
+                                if (modbusConnected)
+                                    GetSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
 
-                                TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
+                                if (modbusConnected)
+                                    TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
                             }
                             catch
                             {
@@ -401,7 +405,7 @@ namespace accdb_isi
                     tempVal1 = GetSicaklik1.ToString();
                 if (GetSicaklik2 != int.MinValue)
                     tempVal2 = GetSicaklik2.ToString();
-                
+
                 if (!string.IsNullOrEmpty(TimerTime))
                     timeVal = TimerTime;
             }
@@ -462,7 +466,7 @@ namespace accdb_isi
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Zamanla yazma hatası: " + ex.Message + $"\nSistem {timerInterval/1000} saniyede bir veri yazıcak");
+                    MessageBox.Show("Zamanla yazma hatası: " + ex.Message + $"\nSistem {timerInterval / 1000} saniyede bir veri yazıcak");
                     timerData = string.Empty;
                 }
 
@@ -520,6 +524,11 @@ namespace accdb_isi
                     return;
                 }
 
+                if (modbusConnected && GetSicaklik1 == int.MinValue)
+                {
+                    MessageBox.Show("Modbus verilerinin cekilmesi bekleniyor");
+                    return;
+                }
                 btnStart.Text = "Durdur";
                 btnStart.BackColor = Color.Red;
                 btnStart.ForeColor = Color.White;

@@ -306,7 +306,7 @@
             this.textBoxSetTableID.Location = new System.Drawing.Point(233, 161);
             this.textBoxSetTableID.Name = "textBoxSetTableID";
             this.textBoxSetTableID.Size = new System.Drawing.Size(100, 20);
-            this.textBoxSetTableID.TabIndex = 12;
+            this.textBoxSetTableID.TabIndex = 3;
             this.textBoxSetTableID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // label5
@@ -323,7 +323,7 @@
             this.textBoxTemp2ID.Location = new System.Drawing.Point(137, 339);
             this.textBoxTemp2ID.Name = "textBoxTemp2ID";
             this.textBoxTemp2ID.Size = new System.Drawing.Size(100, 20);
-            this.textBoxTemp2ID.TabIndex = 10;
+            this.textBoxTemp2ID.TabIndex = 7;
             this.textBoxTemp2ID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // label4
@@ -340,7 +340,7 @@
             this.textBoxTemp1ID.Location = new System.Drawing.Point(137, 305);
             this.textBoxTemp1ID.Name = "textBoxTemp1ID";
             this.textBoxTemp1ID.Size = new System.Drawing.Size(100, 20);
-            this.textBoxTemp1ID.TabIndex = 8;
+            this.textBoxTemp1ID.TabIndex = 6;
             this.textBoxTemp1ID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // textBoxTimerID
@@ -348,7 +348,7 @@
             this.textBoxTimerID.Location = new System.Drawing.Point(137, 270);
             this.textBoxTimerID.Name = "textBoxTimerID";
             this.textBoxTimerID.Size = new System.Drawing.Size(100, 20);
-            this.textBoxTimerID.TabIndex = 7;
+            this.textBoxTimerID.TabIndex = 5;
             this.textBoxTimerID.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // labelTempertureID
