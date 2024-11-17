@@ -25,8 +25,6 @@ namespace ModbusController
         {
             readTimeout = ReadTimeout;
             writeTimeout = WriteTimeout;
-
-            SetTimeout(writeTimeout, readTimeout);
         }
 
         public string RTUConnect(string portAddress)
@@ -37,6 +35,9 @@ namespace ModbusController
                 modbusMaster = new ModbusFactory().CreateRtuMaster(serialPort);
 
                 connectedRTU = true;
+                
+                SetTimeout(writeTimeout, readTimeout);
+
                 return null;
             }
             catch (Exception e)

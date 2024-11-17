@@ -35,6 +35,8 @@ namespace accdb_isi
 
         string operatorName = string.Empty;
         string makineName = string.Empty;
+        string blpnokafileData = string.Empty;
+
 
         int SetSicaklik1 = int.MinValue;
         int SetSicaklik2 = int.MinValue;
@@ -51,7 +53,6 @@ namespace accdb_isi
 
         bool dbConnected = false;
         bool modbusConnected = false;
-        bool threadsCreated = false;
 
         bool plcWriting = false;
 
@@ -68,6 +69,9 @@ namespace accdb_isi
             InitializeComponent();
 
             databaseControl = new DatabaseControl(databasePath);
+            
+            updaterThread = new Thread(UpdateValues);
+            
             modbusControl = new ModbusControl();
         }
 
@@ -79,13 +83,6 @@ namespace accdb_isi
         private void btnConnectModbus_Click(object sender, EventArgs e)
         {
             ConnectModbus(btnConnectModbus.Text == "Modbus Cihazına Bağlan");
-
-            if (threadsCreated == false)
-            {
-                updaterThread = new Thread(UpdateValues);
-
-                threadsCreated = true;
-            }
         }
 
         private void ConnectModbus(bool connect)
@@ -237,6 +234,8 @@ namespace accdb_isi
 
                     operatorName = databaseControl.GetData("tblservertopres", "operator", setTableID).Split(':')[1].Trim();
                     makineName = databaseControl.GetData("tblservertopres", "makine", setTableID).Split(':')[1].Trim();
+                    blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
+
                     SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1", setTableID).Split(':')[1].Trim());
                     SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
                 }
@@ -259,6 +258,8 @@ namespace accdb_isi
             {
                 operatorName = string.Empty;
                 makineName = string.Empty;
+                blpnokafileData = string.Empty;
+
                 SetSicaklik1 = 0;
                 SetSicaklik2 = 0;
 
@@ -281,18 +282,18 @@ namespace accdb_isi
             {
                 try
                 {
-                    string blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
-                    int Sicaklik1 = GetSicaklik1;// press1 sıcaklık
-                    int Sicaklik2 = GetSicaklik2;// press2 sıcaklık
+                    if (GetSicaklik1 == int.MinValue || GetSicaklik2 == int.MinValue || string.IsNullOrEmpty(TimerTime))
+                    {
+                        ProcessController(false);
+                        MessageBox.Show("PLC verileri alınamadı");
+                        return;
+                    }
 
-                    string timerTime = TimerTime;
-
-                    string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(timerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
+                    string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
                     string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
                     string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure / 3600)}:{Convert.ToInt32(SetSure / 60)}:{Convert.ToInt32(SetSure % 60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
 
-                    //string errMessage = databaseControl.WriteData(blpnokafileData, Sicaklik1, Sicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
-                    string errMessage = null;
+                    string errMessage = databaseControl.WriteData(blpnokafileData, GetSicaklik1, GetSicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
                     if (!string.IsNullOrEmpty(errMessage))
                     {
                         ProcessController(false);
