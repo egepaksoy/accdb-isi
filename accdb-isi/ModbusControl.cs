@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 using System.Windows.Forms;
 using NModbus;
-using NModbus.IO;
 using NModbus.Serial;
 
 namespace ModbusController
@@ -48,9 +44,6 @@ namespace ModbusController
 
         public string ConnectPlc()
         {
-            if (!SetTimeout(writeTimeout, readTimeout))
-                MessageBox.Show("Timeout Ayarlanamadı");
-
             try
             {
                 serialPort.Close();
@@ -58,12 +51,10 @@ namespace ModbusController
             }
             catch (TimeoutException e)
             {
-                MessageBox.Show("Timout Error: " + e.Message);
                 return e.Message;
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.Message);
                 return e.Message;
             }
             return null;
@@ -169,9 +160,8 @@ namespace ModbusController
                 foreach (ushort inputRegister in inputRegisters)
                     gelenVeri.Add(inputRegister.ToString());
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show($"Plc'den (inputreg)veri okuma hatası. Plc ID: {SlaveId}\n{ex.Message}");
                 return returnData;
             }
             
@@ -202,9 +192,8 @@ namespace ModbusController
                 foreach (ushort holdingRegister in holdingRegisters)
                     gelenVeri.Add(holdingRegister.ToString());
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show($"Plc'den (holdreg)veri okuma hatası. Plc ID: {SlaveId}\n{ex.Message}");
                 return returnData;
             }
 

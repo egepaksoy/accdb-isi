@@ -1,42 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.OleDb;
 using DatabaseController;
 using ModbusController;
 using Addresses;
 using System.IO.Ports;
-using System.Diagnostics.Eventing.Reader;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using Utils;
-
 
 namespace accdb_isi
 {
     public partial class Form1 : Form
     {
-        DatabaseControl databaseControl;
-        ModbusControl modbusControl;
+        DatabaseControl DatabaseControl;
+        ModbusControl ModbusControl;
 
-        string databasePath = string.Empty;
-        string modbusPort = string.Empty;
-        int tempreture1ID = -1;
-        int tempreture2ID = -1;
-        int timerID = -1;
-        string[] portNames = SerialPort.GetPortNames();
-        string[] oldPortNames;
+        string DatabasePath = string.Empty;
+        string ModbusPort = string.Empty;
+        int Tempreture1ID = -1;
+        int Tempreture2ID = -1;
+        int TimerID = -1;
+        string[] PortNames = SerialPort.GetPortNames();
+        string[] OldPortNames;
 
-        string operatorName = string.Empty;
-        string makineName = string.Empty;
-        string blpnokafileData = string.Empty;
-
+        string OperatorName = string.Empty;
+        string MakineName = string.Empty;
+        string BlpNoKafileData = string.Empty;
 
         int SetSicaklik1 = int.MinValue;
         int SetSicaklik2 = int.MinValue;
@@ -49,30 +37,28 @@ namespace accdb_isi
         string TimerTime = string.Empty;
         string TimerFormat = string.Empty;
 
-        int setTableID = -1;
+        int SetTableID = -1;
 
-        bool dbConnected = false;
-        bool modbusConnected = false;
+        bool DBConnected = false;
+        bool ModbusConnected = false;
 
-        bool plcWriting = false;
+        bool PlcWriting = false;
 
-        bool started = false;
+        bool Started = false;
 
-        bool running = true;
+        string PressStartTime = string.Empty;
 
-        string pressStartTime = string.Empty;
-
-        Thread updaterThread;
+        Thread UpdaterThread;
 
         public Form1()
         {
             InitializeComponent();
 
-            databaseControl = new DatabaseControl(databasePath);
+            DatabaseControl = new DatabaseControl(DatabasePath);
             
-            updaterThread = new Thread(UpdateValues);
+            UpdaterThread = new Thread(UpdateValues);
             
-            modbusControl = new ModbusControl();
+            ModbusControl = new ModbusControl();
         }
 
         private void btnConnectDB_Click(object sender, EventArgs e)
@@ -89,14 +75,14 @@ namespace accdb_isi
         {
             if (connect)
             {
-                if (!modbusConnected)
+                if (!ModbusConnected)
                 {
-                    if (modbusPort == string.Empty)
+                    if (ModbusPort == string.Empty)
                     {
                         MessageBox.Show("Ayarlardan modbus cihazı yolunu seçin");
                         return;
                     }
-                    if (tempreture1ID < 0 || timerID < 0 || tempreture2ID < 0)
+                    if (Tempreture1ID < 0 || TimerID < 0 || Tempreture2ID < 0)
                     {
                         MessageBox.Show("Ayarlardan modbus cihazlarının slave idlerini girin");
                         return;
@@ -104,34 +90,34 @@ namespace accdb_isi
 
                     try
                     {
-                        if (!modbusControl.connectedRTU)
-                            modbusControl.RTUConnect(modbusPort);
-                        modbusControl.ConnectPlc();
+                        if (!ModbusControl.connectedRTU)
+                            ModbusControl.RTUConnect(ModbusPort);
+                        ModbusControl.ConnectPlc();
                     }
                     catch (Exception ex)
                     {
-                        modbusControl.DisconnectPlc();
+                        ModbusControl.DisconnectPlc();
 
-                        if (!string.IsNullOrEmpty(modbusControl.ConnectPlc()))
+                        if (!string.IsNullOrEmpty(ModbusControl.ConnectPlc()))
                         {
                             MessageBox.Show("Modbus bağlantı hatası: " + ex.Message);
                             return;
                         }
                         else
-                            modbusConnected = true;
+                            ModbusConnected = true;
                     }
                 }
-                modbusControl.ConnectPlc();
-                modbusConnected = true;
+                ModbusControl.ConnectPlc();
+                ModbusConnected = true;
 
-                TimerFormat = modbusControl.ReadHoldRegsData(timerID, (int)HoldRegAddresses.timerFormat);
+                TimerFormat = ModbusControl.ReadHoldRegsData(TimerID, (int)HoldRegAddresses.timerFormat);
             }
             else
             {
-                if (modbusConnected)
+                if (ModbusConnected)
                 {
-                    modbusControl.DisconnectPlc();
-                    modbusConnected = false;
+                    ModbusControl.DisconnectPlc();
+                    ModbusConnected = false;
                 }
             }
             ConnectionController();
@@ -141,7 +127,7 @@ namespace accdb_isi
         {
             if (connect)
             {
-                if (databasePath == string.Empty)
+                if (DatabasePath == string.Empty)
                 {
                     MessageBox.Show("Ayarlardan veritabanı seçin");
                     return;
@@ -154,17 +140,17 @@ namespace accdb_isi
                 }
 
                 else if (!string.IsNullOrEmpty(textBoxSetTableID.Text) && decimal.TryParse(textBoxSetTableID.Text, out decimal result))
-                    setTableID = Convert.ToInt32(textBoxSetTableID.Text);
+                    SetTableID = Convert.ToInt32(textBoxSetTableID.Text);
 
-                if (!dbConnected)
+                if (!DBConnected)
                 {
-                    databaseControl = new DatabaseControl(databasePath);
-                    dbConnected = databaseControl.ConnectDatabase();
+                    DatabaseControl = new DatabaseControl(DatabasePath);
+                    DBConnected = DatabaseControl.ConnectDatabase();
                 }
 
                 ConnectionController();
 
-                int satirSayisi = Convert.ToInt32(databaseControl.DataCount("tblprestoserver"));
+                int satirSayisi = Convert.ToInt32(DatabaseControl.DataCount("tblprestoserver"));
 
                 if (satirSayisi == 0)
                 {
@@ -183,15 +169,15 @@ namespace accdb_isi
             }
             else
             {
-                if (dbConnected)
-                    dbConnected = !databaseControl.DisconnectDatabase();
+                if (DBConnected)
+                    DBConnected = !DatabaseControl.DisconnectDatabase();
                 ConnectionController();
             }
         }
 
         private void LabelModbusConnected()
         {
-            if (modbusConnected)
+            if (ModbusConnected)
             {
                 btnConnectModbus.BackColor = Color.Red;
                 btnConnectModbus.ForeColor = Color.White;
@@ -207,7 +193,7 @@ namespace accdb_isi
 
         private void LabelDBConnected()
         {
-            if (dbConnected)
+            if (DBConnected)
             {
                 btnConnectDB.BackColor = Color.Red;
                 btnConnectDB.ForeColor = Color.White;
@@ -223,29 +209,29 @@ namespace accdb_isi
 
         private void ConnectionController()
         {
-            if (dbConnected)
+            if (DBConnected)
             {
                 string timerData = string.Empty;
                 int timerInterval = 100;
 
                 try
                 {
-                    timerData = databaseControl.GetData("tblservertopres", "SetOrnekAraligi", setTableID);
+                    timerData = DatabaseControl.GetData("tblservertopres", "SetOrnekAraligi", SetTableID);
 
-                    operatorName = databaseControl.GetData("tblservertopres", "operator", setTableID).Split(':')[1].Trim();
-                    makineName = databaseControl.GetData("tblservertopres", "makine", setTableID).Split(':')[1].Trim();
-                    blpnokafileData = databaseControl.GetData("tblservertopres", "blpnokafile", setTableID).Split(':')[1].Trim();
+                    OperatorName = DatabaseControl.GetData("tblservertopres", "operator", SetTableID).Split(':')[1].Trim();
+                    MakineName = DatabaseControl.GetData("tblservertopres", "makine", SetTableID).Split(':')[1].Trim();
+                    BlpNoKafileData = DatabaseControl.GetData("tblservertopres", "blpnokafile", SetTableID).Split(':')[1].Trim();
 
-                    SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1", setTableID).Split(':')[1].Trim());
-                    SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
+                    SetSicaklik1 = Convert.ToInt32(DatabaseControl.GetData("tblservertopres", "SetSicaklik1", SetTableID).Split(':')[1].Trim());
+                    SetSicaklik2 = Convert.ToInt32(DatabaseControl.GetData("tblservertopres", "SetSicaklik2", SetTableID).Split(':')[1].Trim());
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Veritabanından veri çekme hatası: " + ex.Message);
                 }
 
-                operatorLabel.Text = "Operatör: " + operatorName;
-                makineLabel.Text = "Makine: " + makineName;
+                operatorLabel.Text = "Operatör: " + OperatorName;
+                makineLabel.Text = "Makine: " + MakineName;
                 hedefSicaklik1.Text = "Hedef Sıcaklık: " + SetSicaklik1;
                 hedefSicaklik2.Text = "Hedef Sıcaklık: " + SetSicaklik2;
 
@@ -256,9 +242,9 @@ namespace accdb_isi
             }
             else
             {
-                operatorName = string.Empty;
-                makineName = string.Empty;
-                blpnokafileData = string.Empty;
+                OperatorName = string.Empty;
+                MakineName = string.Empty;
+                BlpNoKafileData = string.Empty;
 
                 SetSicaklik1 = 0;
                 SetSicaklik2 = 0;
@@ -278,7 +264,7 @@ namespace accdb_isi
 
         private void writeDBTimer_Tick(object sender, EventArgs e)
         {
-            if (started)
+            if (Started)
             {
                 try
                 {
@@ -289,11 +275,11 @@ namespace accdb_isi
                         return;
                     }
 
-                    string GetSure = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
-                    string GetStartTime = pressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
-                    string GetFinishTime = DateTime.Parse(pressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure / 3600)}:{Convert.ToInt32(SetSure / 60)}:{Convert.ToInt32(SetSure % 60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
+                    string GetSure = DateTime.Parse(PressStartTime).Add(TimeSpan.Parse(TimerTime)).ToString("yyyy-MM-dd HH:mm:ss");// timer zamani (baslangic + plc zamanı)
+                    string GetStartTime = PressStartTime;// press başlama zamanı (başlata basınca gelen zaman)
+                    string GetFinishTime = DateTime.Parse(PressStartTime).Add(TimeSpan.Parse($"{Convert.ToInt32(SetSure / 3600)}:{Convert.ToInt32(SetSure / 60)}:{Convert.ToInt32(SetSure % 60)}")).ToString("yyyy-MM-dd HH:mm:ss");// press bitiş zaman (başlangıç + SetSure değeri)
 
-                    string errMessage = databaseControl.WriteData(blpnokafileData, GetSicaklik1, GetSicaklik2, GetSure, GetStartTime, GetFinishTime, operatorName, makineName);
+                    string errMessage = DatabaseControl.WriteData(BlpNoKafileData, GetSicaklik1, GetSicaklik2, GetSure, GetStartTime, GetFinishTime, OperatorName, MakineName);
                     if (!string.IsNullOrEmpty(errMessage))
                     {
                         ProcessController(false);
@@ -314,14 +300,14 @@ namespace accdb_isi
         {
             try
             {
-                databaseControl.DeleteData("tblprestoserver");
+                DatabaseControl.DeleteData("tblprestoserver");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Veritabanını temizlerken sorun çıktı: " + ex.Message);
             }
 
-            int satirSayisi = Convert.ToInt32(databaseControl.DataCount("tblprestoserver"));
+            int satirSayisi = Convert.ToInt32(DatabaseControl.DataCount("tblprestoserver"));
 
             if (satirSayisi == 0)
             {
@@ -341,7 +327,7 @@ namespace accdb_isi
 
         private void generalTimer_Tick(object sender, EventArgs e)
         {
-            UpdateLabels(modbusConnected & tabControl1.SelectedTab.Name == "tabIslemler");
+            UpdateLabels(ModbusConnected & tabControl1.SelectedTab.Name == "tabIslemler");
         }
 
         private void FileRead()
@@ -352,7 +338,7 @@ namespace accdb_isi
             openFileDialog.Title = "Access Veritabanı Dosyaları Seç";
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
-                databasePath = openFileDialog.FileName;
+                DatabasePath = openFileDialog.FileName;
         }
 
         public void UpdateValues()
@@ -362,31 +348,31 @@ namespace accdb_isi
 
             while (true)
             {
-                if (modbusConnected)
+                if (ModbusConnected)
                 {
-                    if (!plcWriting)
+                    if (!PlcWriting)
                     {
-                        lock (modbusControl)
+                        lock (ModbusControl)
                         {
                             try
                             {
-                                if (modbusConnected)
+                                if (ModbusConnected)
                                 {
-                                    tempSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
+                                    tempSicaklik1 = Convert.ToInt32(ModbusControl.ReadInputRegsData(Tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
                                     if (tempSicaklik1 >= 1000)
                                         tempSicaklik1 /= 1000;
                                     GetSicaklik1 = tempSicaklik1;
                                 }
-                                if (modbusConnected)
+                                if (ModbusConnected)
                                 {
-                                    tempSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
+                                    tempSicaklik2 = Convert.ToInt32(ModbusControl.ReadInputRegsData(Tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
                                     if (tempSicaklik2 >= 1000)
                                         tempSicaklik2 /= 1000;
                                     GetSicaklik2 = tempSicaklik2;
                                 }
 
-                                if (modbusConnected)
-                                    TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
+                                if (ModbusConnected)
+                                    TimerTime = Utils.Utils.PlcToTime(ModbusControl.ReadInputRegsData(TimerID, (int)InputRegAddresses.timerValue), TimerFormat);
                             }
                             catch
                             {
@@ -411,8 +397,8 @@ namespace accdb_isi
 
             if (active)
             {
-                if (!updaterThread.IsAlive)
-                    updaterThread.Start();
+                if (!UpdaterThread.IsAlive)
+                    UpdaterThread.Start();
 
 
                 if (GetSicaklik1 != int.MinValue)
@@ -434,19 +420,19 @@ namespace accdb_isi
             string timerData = string.Empty;
             int timerInterval = 10000;
 
-            if (dbConnected && modbusConnected)
+            if (DBConnected && ModbusConnected)
             {
-                SetSicaklik1 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik1", setTableID).Split(':')[1].Trim());
-                SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
-                SetSure = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSure", setTableID).Split(':')[1].Trim());
+                SetSicaklik1 = Convert.ToInt32(DatabaseControl.GetData("tblservertopres", "SetSicaklik1", SetTableID).Split(':')[1].Trim());
+                SetSicaklik2 = Convert.ToInt32(DatabaseControl.GetData("tblservertopres", "SetSicaklik2", SetTableID).Split(':')[1].Trim());
+                SetSure = Convert.ToInt32(DatabaseControl.GetData("tblservertopres", "SetSure", SetTableID).Split(':')[1].Trim());
 
-                lock (modbusControl)
+                lock (ModbusControl)
                 {
-                    plcWriting = true;
+                    PlcWriting = true;
                     try
                     {
-                        string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
-                        string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
+                        string temp1Err = ModbusControl.WriteHoldRegData(Tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
+                        string temp2Err = ModbusControl.WriteHoldRegData(Tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
 
                         if (TimerFormat == null)
                             return;
@@ -455,7 +441,7 @@ namespace accdb_isi
                         if (timerTime == -1)
                             return;
 
-                        string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, timerTime);
+                        string timerErr = ModbusControl.WriteHoldRegData(TimerID, (int)HoldRegAddresses.timerSet, timerTime);
 
                         if (timerErr != null || temp1Err != null || temp2Err != null)
                         {
@@ -470,13 +456,13 @@ namespace accdb_isi
                     }
                     finally
                     {
-                        plcWriting = false;
+                        PlcWriting = false;
                     }
                 }
 
                 try
                 {
-                    timerData = databaseControl.GetData("tblservertopres", "SetOrnekAraligi", setTableID);
+                    timerData = DatabaseControl.GetData("tblservertopres", "SetOrnekAraligi", SetTableID);
                 }
                 catch (Exception ex)
                 {
@@ -493,12 +479,12 @@ namespace accdb_isi
                 writeDBTimer.Interval = timerInterval;
                 writeDBTimer.Enabled = true;
 
-                started = true;
+                Started = true;
 
                 writerController.Interval = SetSure * 1000;
                 writerController.Enabled = true;
 
-                pressStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                PressStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             }
         }
 
@@ -526,13 +512,13 @@ namespace accdb_isi
             {
                 ConnectDB(true);
                 ConnectModbus(true);
-                if (!(dbConnected && modbusConnected))
+                if (!(DBConnected && ModbusConnected))
                 {
                     MessageBox.Show("Veritabanına veya PLC bağlantısı sağlanılamadı");
                     return;
                 }
 
-                if (modbusConnected && GetSicaklik1 == int.MinValue)
+                if (ModbusConnected && GetSicaklik1 == int.MinValue)
                 {
                     MessageBox.Show("Modbus verilerinin cekilmesi bekleniyor");
                     return;
@@ -541,7 +527,7 @@ namespace accdb_isi
                 btnStart.BackColor = Color.Red;
                 btnStart.ForeColor = Color.White;
 
-                started = true;
+                Started = true;
                 FirstStart();
             }
             else
@@ -550,7 +536,7 @@ namespace accdb_isi
                 btnStart.BackColor = Color.LimeGreen;
                 btnStart.ForeColor = Color.Black;
 
-                started = false;
+                Started = false;
                 EndProcess();
             }
         }
@@ -558,12 +544,12 @@ namespace accdb_isi
         private void btnDBSelect_Click(object sender, EventArgs e)
         {
             FileRead();
-            textBoxDBPath.Text = databasePath;
+            textBoxDBPath.Text = DatabasePath;
         }
 
         private void comboBoxModbusConn_SelectionChangeCommited(object sender, EventArgs e)
         {
-            modbusPort = comboBoxModbusConn.Text;
+            ModbusPort = comboBoxModbusConn.Text;
         }
 
         private void writerController_Tick(object sender, EventArgs e)
@@ -574,49 +560,48 @@ namespace accdb_isi
 
         private void settingsTextsChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(textBoxDBPath.Text) && databasePath != textBoxDBPath.Text)
-                databasePath = textBoxDBPath.Text;
+            if (string.IsNullOrEmpty(textBoxDBPath.Text) && DatabasePath != textBoxDBPath.Text)
+                DatabasePath = textBoxDBPath.Text;
 
-            if (!string.IsNullOrEmpty(textBoxSetTableID.Text) && Convert.ToInt32(textBoxSetTableID.Text) != setTableID)
-                setTableID = Convert.ToInt32(textBoxSetTableID.Text);
+            if (!string.IsNullOrEmpty(textBoxSetTableID.Text) && Convert.ToInt32(textBoxSetTableID.Text) != SetTableID)
+                SetTableID = Convert.ToInt32(textBoxSetTableID.Text);
 
-            if (!string.IsNullOrEmpty(textBoxTimerID.Text) && Convert.ToInt32(textBoxTimerID.Text) != timerID)
-                timerID = Convert.ToInt32(textBoxTimerID.Text);
-            if (!string.IsNullOrEmpty(textBoxTemp1ID.Text) && Convert.ToInt32(textBoxTemp1ID.Text) != timerID)
-                tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
-            if (!string.IsNullOrEmpty(textBoxTemp2ID.Text) && Convert.ToInt32(textBoxTemp2ID.Text) != timerID)
-                tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
+            if (!string.IsNullOrEmpty(textBoxTimerID.Text) && Convert.ToInt32(textBoxTimerID.Text) != TimerID)
+                TimerID = Convert.ToInt32(textBoxTimerID.Text);
+            if (!string.IsNullOrEmpty(textBoxTemp1ID.Text) && Convert.ToInt32(textBoxTemp1ID.Text) != TimerID)
+                Tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
+            if (!string.IsNullOrEmpty(textBoxTemp2ID.Text) && Convert.ToInt32(textBoxTemp2ID.Text) != TimerID)
+                Tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
         }
 
         private void comboBoxModbusConn_Click(object sender, EventArgs e)
         {
-            portNames = SerialPort.GetPortNames();
+            PortNames = SerialPort.GetPortNames();
 
-            if (portNames != oldPortNames)
+            if (PortNames != OldPortNames)
             {
-                oldPortNames = portNames;
+                OldPortNames = PortNames;
                 comboBoxModbusConn.Items.Clear();
-                comboBoxModbusConn.Items.AddRange(portNames);
+                comboBoxModbusConn.Items.AddRange(PortNames);
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            running = false;
             Application.ExitThread();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (updaterThread.IsBackground || updaterThread.IsAlive)
-                updaterThread.Abort();
+            if (UpdaterThread.IsBackground || UpdaterThread.IsAlive)
+                UpdaterThread.Abort();
 
             Application.Exit();
         }
 
         private void comboBoxModbusConn_TextUpdate(object sender, EventArgs e)
         {
-            modbusPort = comboBoxModbusConn.Text;
+            ModbusPort = comboBoxModbusConn.Text;
         }
     }
 }
