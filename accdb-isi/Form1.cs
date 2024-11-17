@@ -357,6 +357,9 @@ namespace accdb_isi
 
         public void UpdateValues()
         {
+            int tempSicaklik1 = 0;
+            int tempSicaklik2 = 0;
+
             while (true)
             {
                 if (modbusConnected)
@@ -368,17 +371,22 @@ namespace accdb_isi
                             try
                             {
                                 if (modbusConnected)
-                                    GetSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
+                                {
+                                    tempSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
+                                    if (tempSicaklik1 >= 1000)
+                                        tempSicaklik1 /= 1000;
+                                    GetSicaklik1 = tempSicaklik1;
+                                }
                                 if (modbusConnected)
-                                    GetSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
+                                {
+                                    tempSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
+                                    if (tempSicaklik2 >= 1000)
+                                        tempSicaklik2 /= 1000;
+                                    GetSicaklik2 = tempSicaklik2;
+                                }
 
                                 if (modbusConnected)
                                     TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
-
-                                if (GetSicaklik1 >= 1000)
-                                    GetSicaklik1 /= 1000;
-                                if (GetSicaklik2 >= 1000)
-                                    GetSicaklik2 /= 1000;
                             }
                             catch
                             {
