@@ -600,5 +600,10 @@ namespace accdb_isi
 
             Application.Exit();
         }
+
+        private void comboBoxModbusConn_TextUpdate(object sender, EventArgs e)
+        {
+            modbusPort = comboBoxModbusConn.Text;
+        }
     }
 }
