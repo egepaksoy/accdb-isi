@@ -488,14 +488,8 @@ namespace accdb_isi
             }
         }
 
-        private void StopModbus()
-        {
-            ConnectModbus(false);
-        }
-
         private void EndProcess()
         {
-            StopModbus();
             writerController.Stop();
             writerController.Enabled = false;
             writerController.Interval = 100;
