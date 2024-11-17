@@ -52,7 +52,9 @@ namespace accdb_isi
         bool dbConnected = false;
         bool modbusConnected = false;
         bool threadsCreated = false;
-        
+
+        bool plcWriting = false;
+
         bool started = false;
 
         bool running = true;
@@ -353,26 +355,30 @@ namespace accdb_isi
 
         public void UpdateValues()
         {
-            while (running)
+            while (true)
             {
                 if (modbusConnected)
                 {
-                    try
+                    if (!plcWriting)
                     {
                         lock (modbusControl)
                         {
-                            GetSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
-                            GetSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
+                            try
+                            {
+                                GetSicaklik1 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture1ID, (int)InputRegAddresses.olculenSicaklik));
+                                GetSicaklik2 = Convert.ToInt32(modbusControl.ReadInputRegsData(tempreture2ID, (int)InputRegAddresses.olculenSicaklik));
 
-                            TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
+                                TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
+                            }
+                            catch
+                            {
+                                GetSicaklik1 = int.MinValue;
+                                GetSicaklik2 = int.MinValue;
+
+                                TimerTime = null;
+                            }
                         }
-                    }
-                    catch
-                    {
-                        GetSicaklik1 = int.MinValue;
-                        GetSicaklik2 = int.MinValue;
-
-                        TimerTime = null;
+                        Thread.Sleep(generalTimer.Interval);
                     }
                 }
             }
@@ -416,30 +422,38 @@ namespace accdb_isi
                 SetSicaklik2 = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSicaklik2", setTableID).Split(':')[1].Trim());
                 SetSure = Convert.ToInt32(databaseControl.GetData("tblservertopres", "SetSure", setTableID).Split(':')[1].Trim());
 
-                try
+                lock (modbusControl)
                 {
-                    string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
-                    string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
-
-                    if (TimerFormat == null)
-                        return;
-
-                    int timerTime = Utils.Utils.TimeToPlc(SetSure, TimerFormat);
-                    if (timerTime == -1)
-                        return;
-
-                    string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, timerTime);
-
-                    if (timerErr != null || temp1Err != null || temp2Err != null)
+                    plcWriting = true;
+                    try
                     {
-                        MessageBox.Show("Modbus cihazına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
+                        string temp1Err = modbusControl.WriteHoldRegData(tempreture1ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik1);
+                        string temp2Err = modbusControl.WriteHoldRegData(tempreture2ID, (int)HoldRegAddresses.setSicaklik1, SetSicaklik2);
+
+                        if (TimerFormat == null)
+                            return;
+
+                        int timerTime = Utils.Utils.TimeToPlc(SetSure, TimerFormat);
+                        if (timerTime == -1)
+                            return;
+
+                        string timerErr = modbusControl.WriteHoldRegData(timerID, (int)HoldRegAddresses.timerSet, timerTime);
+
+                        if (timerErr != null || temp1Err != null || temp2Err != null)
+                        {
+                            MessageBox.Show("Modbus cihazına veri yazma hatası: " + timerErr + temp1Err + temp2Err);
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Modbus cihazına veri yazma hatası: " + ex.Message);
                         return;
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Modbus cihazına veri yazma hatası: " + ex.Message);
-                    return;
+                    finally
+                    {
+                        plcWriting = false;
+                    }
                 }
 
                 try
