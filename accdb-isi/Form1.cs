@@ -374,6 +374,11 @@ namespace accdb_isi
 
                                 if (modbusConnected)
                                     TimerTime = Utils.Utils.PlcToTime(modbusControl.ReadInputRegsData(timerID, (int)InputRegAddresses.timerValue), TimerFormat);
+
+                                if (GetSicaklik1 >= 1000)
+                                    GetSicaklik1 /= 1000;
+                                if (GetSicaklik2 >= 1000)
+                                    GetSicaklik2 /= 1000;
                             }
                             catch
                             {
