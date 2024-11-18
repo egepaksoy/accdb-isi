@@ -105,5 +105,18 @@ namespace Utils
             MessageBox.Show($"Veritabanındaki süre formatı plc'deki ile uyumsuz\nPlc Formatı: {format} Veritabanı süre: {setSure}\nPlc formatını değiştirin.");
             return -1;
         }
+
+        public static string FileRead()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Access Database Files (*.accdb)|*.accdb";
+            openFileDialog.Multiselect = false;
+            openFileDialog.Title = "Access Veritabanı Dosyaları Seç";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+                return openFileDialog.FileName;
+
+            return null;
+        }
     }
 }

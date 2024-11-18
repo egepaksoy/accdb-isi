@@ -330,17 +330,6 @@ namespace accdb_isi
             UpdateLabels(ModbusConnected & tabControl1.SelectedTab.Name == "tabIslemler");
         }
 
-        private void FileRead()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Access Database Files (*.accdb)|*.accdb";
-            openFileDialog.Multiselect = false;
-            openFileDialog.Title = "Access Veritabanı Dosyaları Seç";
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-                DatabasePath = openFileDialog.FileName;
-        }
-
         public void UpdateValues()
         {
             int tempSicaklik1 = 0;
@@ -399,7 +388,6 @@ namespace accdb_isi
             {
                 if (!UpdaterThread.IsAlive)
                     UpdaterThread.Start();
-
 
                 if (GetSicaklik1 != int.MinValue)
                     tempVal1 = GetSicaklik1.ToString();
@@ -543,7 +531,7 @@ namespace accdb_isi
 
         private void btnDBSelect_Click(object sender, EventArgs e)
         {
-            FileRead();
+            DatabasePath = Utils.Utils.FileRead();
             textBoxDBPath.Text = DatabasePath;
         }
 
