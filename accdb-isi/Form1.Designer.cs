@@ -74,7 +74,7 @@
             // 
             this.hedefSicaklik1.AutoSize = true;
             this.hedefSicaklik1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.hedefSicaklik1.Location = new System.Drawing.Point(308, 138);
+            this.hedefSicaklik1.Location = new System.Drawing.Point(64, 138);
             this.hedefSicaklik1.Name = "hedefSicaklik1";
             this.hedefSicaklik1.Size = new System.Drawing.Size(115, 18);
             this.hedefSicaklik1.TabIndex = 0;
@@ -84,7 +84,7 @@
             // 
             this.aktifSicaklik1.AutoSize = true;
             this.aktifSicaklik1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.aktifSicaklik1.Location = new System.Drawing.Point(308, 162);
+            this.aktifSicaklik1.Location = new System.Drawing.Point(64, 162);
             this.aktifSicaklik1.Name = "aktifSicaklik1";
             this.aktifSicaklik1.Size = new System.Drawing.Size(104, 18);
             this.aktifSicaklik1.TabIndex = 1;
@@ -94,7 +94,7 @@
             // 
             this.hedefSicaklik2.AutoSize = true;
             this.hedefSicaklik2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.hedefSicaklik2.Location = new System.Drawing.Point(581, 138);
+            this.hedefSicaklik2.Location = new System.Drawing.Point(568, 138);
             this.hedefSicaklik2.Name = "hedefSicaklik2";
             this.hedefSicaklik2.Size = new System.Drawing.Size(115, 18);
             this.hedefSicaklik2.TabIndex = 2;
@@ -104,7 +104,7 @@
             // 
             this.aktifSicaklik2.AutoSize = true;
             this.aktifSicaklik2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.aktifSicaklik2.Location = new System.Drawing.Point(581, 162);
+            this.aktifSicaklik2.Location = new System.Drawing.Point(568, 162);
             this.aktifSicaklik2.Name = "aktifSicaklik2";
             this.aktifSicaklik2.Size = new System.Drawing.Size(104, 18);
             this.aktifSicaklik2.TabIndex = 3;
@@ -114,7 +114,7 @@
             // 
             this.operatorLabel.AutoSize = true;
             this.operatorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.operatorLabel.Location = new System.Drawing.Point(23, 18);
+            this.operatorLabel.Location = new System.Drawing.Point(22, 17);
             this.operatorLabel.Name = "operatorLabel";
             this.operatorLabel.Size = new System.Drawing.Size(76, 20);
             this.operatorLabel.TabIndex = 4;
@@ -124,7 +124,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label1.Location = new System.Drawing.Point(308, 95);
+            this.label1.Location = new System.Drawing.Point(64, 95);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(146, 16);
             this.label1.TabIndex = 5;
@@ -134,7 +134,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label2.Location = new System.Drawing.Point(581, 95);
+            this.label2.Location = new System.Drawing.Point(568, 95);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(146, 16);
             this.label2.TabIndex = 6;
@@ -262,7 +262,7 @@
             // 
             this.labelTimerValue.AutoSize = true;
             this.labelTimerValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.labelTimerValue.Location = new System.Drawing.Point(39, 138);
+            this.labelTimerValue.Location = new System.Drawing.Point(362, 138);
             this.labelTimerValue.Name = "labelTimerValue";
             this.labelTimerValue.Size = new System.Drawing.Size(57, 31);
             this.labelTimerValue.TabIndex = 17;
@@ -272,7 +272,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label7.Location = new System.Drawing.Point(52, 95);
+            this.label7.Location = new System.Drawing.Point(347, 95);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(90, 16);
             this.label7.TabIndex = 16;
@@ -303,7 +303,7 @@
             // 
             // textBoxSetTableID
             // 
-            this.textBoxSetTableID.Location = new System.Drawing.Point(233, 161);
+            this.textBoxSetTableID.Location = new System.Drawing.Point(122, 159);
             this.textBoxSetTableID.Name = "textBoxSetTableID";
             this.textBoxSetTableID.Size = new System.Drawing.Size(100, 20);
             this.textBoxSetTableID.TabIndex = 3;
@@ -312,7 +312,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(150, 164);
+            this.label5.Location = new System.Drawing.Point(35, 162);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(77, 13);
             this.label5.TabIndex = 11;
@@ -393,15 +393,15 @@
             // 
             this.textBoxDBPath.Location = new System.Drawing.Point(122, 133);
             this.textBoxDBPath.Name = "textBoxDBPath";
-            this.textBoxDBPath.Size = new System.Drawing.Size(422, 20);
+            this.textBoxDBPath.Size = new System.Drawing.Size(319, 20);
             this.textBoxDBPath.TabIndex = 2;
             this.textBoxDBPath.TextChanged += new System.EventHandler(this.settingsTextsChanged);
             // 
             // btnDBSelect
             // 
-            this.btnDBSelect.Location = new System.Drawing.Point(38, 159);
+            this.btnDBSelect.Location = new System.Drawing.Point(440, 133);
             this.btnDBSelect.Name = "btnDBSelect";
-            this.btnDBSelect.Size = new System.Drawing.Size(99, 23);
+            this.btnDBSelect.Size = new System.Drawing.Size(99, 20);
             this.btnDBSelect.TabIndex = 1;
             this.btnDBSelect.Text = "Veritabanı Seç";
             this.btnDBSelect.UseVisualStyleBackColor = true;
