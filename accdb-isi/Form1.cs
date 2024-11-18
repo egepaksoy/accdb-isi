@@ -77,6 +77,9 @@ namespace accdb_isi
             {
                 if (!ModbusConnected)
                 {
+                    if (!string.IsNullOrEmpty(comboBoxModbusConn.Text))
+                        ModbusPort = comboBoxModbusConn.Text;
+
                     if (ModbusPort == string.Empty)
                     {
                         MessageBox.Show("Ayarlardan modbus cihazı yolunu seçin");
@@ -560,6 +563,9 @@ namespace accdb_isi
                 Tempreture1ID = Convert.ToInt32(textBoxTemp1ID.Text);
             if (!string.IsNullOrEmpty(textBoxTemp2ID.Text) && Convert.ToInt32(textBoxTemp2ID.Text) != TimerID)
                 Tempreture2ID = Convert.ToInt32(textBoxTemp2ID.Text);
+
+            if (string.IsNullOrEmpty(comboBoxModbusConn.Text))
+                ModbusPort = comboBoxModbusConn.Text;
         }
 
         private void comboBoxModbusConn_Click(object sender, EventArgs e)
@@ -585,11 +591,6 @@ namespace accdb_isi
                 UpdaterThread.Abort();
 
             Application.Exit();
-        }
-
-        private void comboBoxModbusConn_TextUpdate(object sender, EventArgs e)
-        {
-            ModbusPort = comboBoxModbusConn.Text;
         }
     }
 }

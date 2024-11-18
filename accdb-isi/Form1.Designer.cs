@@ -377,7 +377,7 @@
             this.comboBoxModbusConn.Size = new System.Drawing.Size(100, 21);
             this.comboBoxModbusConn.TabIndex = 4;
             this.comboBoxModbusConn.SelectionChangeCommitted += new System.EventHandler(this.comboBoxModbusConn_SelectionChangeCommited);
-            this.comboBoxModbusConn.TextUpdate += new System.EventHandler(this.comboBoxModbusConn_TextUpdate);
+            this.comboBoxModbusConn.TextUpdate += new System.EventHandler(this.settingsTextsChanged);
             this.comboBoxModbusConn.Click += new System.EventHandler(this.comboBoxModbusConn_Click);
             // 
             // label3
